@@ -1,31 +1,36 @@
-import { Exclude } from 'class-transformer';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   UpdateDateColumn,
   CreateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
-import { RoleType } from '../enum/RoleType';
+import { IndustryType } from '../enum/IndustryType';
+import { User } from './User';
 
 @Entity()
-export class User {
+export class Store {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @Column({ unique: true })
-  email: string;
+  @Column()
+  name: string;
 
   @Column()
-  @Exclude()
-  password: string;
+  industry: IndustryType;
 
-  @Column()
-  role: RoleType;
+  @Column({ nullable: true })
+  logoPath?: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 }

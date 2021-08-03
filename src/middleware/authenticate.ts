@@ -7,11 +7,10 @@ export const authenticate = (req, res, next) => {
   if (token == null) return res.sendStatus(401);
 
   jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
-    console.log(err);
-
-    if (err) return res.sendStatus(403);
-
-    console.log(user);
+    if (err)
+      return res.status(403).json({
+        message: 'Unathourized',
+      });
     req.user = user;
 
     next();

@@ -3,13 +3,31 @@ import { createConnection } from 'typeorm';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import { Request, Response } from 'express';
+import * as cors from 'cors';
+import * as dotenv from 'dotenv';
+// get config vars
+dotenv.config();
 import { Routes } from './routes';
+import cloudinaryV2 from './cloudinary.config';
+
+// import * as multer from 'multer';
+
+// const fileStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'images');
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, file.filename + '-' + file.orig)
+//   }
+// })
 
 createConnection()
   .then(async (connection) => {
     const app = express();
-    // app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(cors());
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    // app.use(multer({ dest: 'images' }).single('image'));
 
     // register express routes from defined application routes
     Routes.forEach((route) => {
@@ -46,7 +64,7 @@ createConnection()
     // ...
 
     // start express server
-    app.listen(3000);
+    app.listen(4000);
 
     // insert new users for test
     // await connection.manager.save(

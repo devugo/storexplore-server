@@ -1,9 +1,11 @@
 import { UserController } from './controller/UserController';
 import { authenticate } from './middleware/authenticate';
 import { AuthRoutes } from './route/auth';
+import { StoreRoutes } from './route/store';
 
 export const Routes = [
   ...AuthRoutes,
+  ...StoreRoutes,
   {
     method: 'get',
     route: '/users',
