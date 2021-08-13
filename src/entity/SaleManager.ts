@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   OneToOne,
   JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Store } from './Store';
 import { User } from './User';
@@ -30,11 +31,17 @@ export class SaleManager {
   @Column({ nullable: true })
   photo?: string;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user.saleManager, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   user: User;
 
-  @OneToOne(() => Store)
+  @ManyToOne((_type) => Store, (store) => store.saleManagers, {
+    eager: false,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   store: Store;
 

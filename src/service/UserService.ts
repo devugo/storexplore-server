@@ -9,7 +9,7 @@ export class UserService {
   private userRepository = getRepository(User);
 
   async register(createUserDto: CreateUserDto): Promise<User> {
-    const { email, password } = createUserDto;
+    const { email, password, role } = createUserDto;
 
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(password, salt);
@@ -17,7 +17,7 @@ export class UserService {
     const user = this.userRepository.create({
       email,
       password: hashPassword,
-      role: RoleType.ADMIN,
+      role: role ? role : RoleType.ADMIN,
     });
 
     try {

@@ -13,7 +13,7 @@ export const StoreRoutes = [
   },
   {
     method: 'get',
-    route: '/stores/:id',
+    route: '/stores/mine',
     controller: StoreController,
     action: 'single',
     middleware: authenticate,

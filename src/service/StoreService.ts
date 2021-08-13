@@ -30,21 +30,21 @@ export class StoreService {
     }
   }
 
-  async single(response: Response, id: string, user: User): Promise<Store> {
+  async single(response: Response, user: User): Promise<Store> {
     try {
       const store = await this.storeRepository.findOne({
-        where: { id, user },
+        where: { user },
       });
 
       if (!store) {
-        return notFoundError(response, notFoundErrMsg(id));
+        return notFoundError(response, 'Store doesnt exist');
       }
       return store;
     } catch (error) {
       if (error.code === ERROR_CODE.internal) {
         return serverError(response);
       }
-      return notFoundError(response, notFoundErrMsg(id));
+      return notFoundError(response, 'Store doesnt exist');
     }
   }
 
@@ -97,7 +97,6 @@ export class StoreService {
         return notFoundError(response, notFoundErrMsg(id));
       }
     } catch (error) {
-      console.log({ ERROR_COE: error.code });
       if (error.code === ERROR_CODE.internal) {
         return serverError(response, error.message);
       }

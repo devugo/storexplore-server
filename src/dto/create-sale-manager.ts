@@ -9,4 +9,6 @@ export type CreateSaleManagerDto = {
   photo?: string;
   user?: User;
   store?: Store;
+  email: string;
+  password: string;
 };

@@ -46,16 +46,12 @@ export class StoreController {
 
   async single(request: Request, response: Response, next: NextFunction) {
     const requestUser = request.user;
-    const id = request.params.id;
 
     try {
       const user = await this.userRepository.findOne({
         email: requestUser.email,
       });
-
-      if (id) {
-        return await this.storeService.single(response, id, user);
-      }
+      return await this.storeService.single(response, user);
     } catch (_error) {
       return unathorizedError(response);
     }
@@ -104,7 +100,6 @@ export class StoreController {
 
         const file: string = await new Promise(function (resolve, reject) {
           form.parse(request, async (err, fields, files) => {
-            console.log('during before');
             resolve(files.image.path);
           });
         });

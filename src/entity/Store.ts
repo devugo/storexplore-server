@@ -6,8 +6,10 @@ import {
   CreateDateColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { IndustryType } from '../enum/IndustryType';
+import { SaleManager } from './SaleManager';
 import { User } from './User';
 
 @Entity()
@@ -23,6 +25,11 @@ export class Store {
 
   @Column({ nullable: true })
   logoPath?: string;
+
+  @OneToMany((_type) => SaleManager, (saleManager) => saleManager.store, {
+    eager: false,
+  })
+  saleManagers: SaleManager[];
 
   @CreateDateColumn()
   createdAt: Date;

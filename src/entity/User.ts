@@ -5,8 +5,10 @@ import {
   Column,
   UpdateDateColumn,
   CreateDateColumn,
+  OneToOne,
 } from 'typeorm';
 import { RoleType } from '../enum/RoleType';
+import { SaleManager } from './SaleManager';
 
 @Entity()
 export class User {
@@ -22,6 +24,11 @@ export class User {
 
   @Column()
   role: RoleType;
+
+  @OneToOne(() => SaleManager, (saleManager) => saleManager.user, {
+    onDelete: 'CASCADE',
+  })
+  saleManager: SaleManager;
 
   @CreateDateColumn()
   createdAt: Date;

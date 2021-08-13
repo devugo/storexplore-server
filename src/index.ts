@@ -83,7 +83,7 @@ createConnection()
     // );
 
     console.log(
-      'Express server has started on port 3000. Open http://localhost:3000/users to see results',
+      'Express server has started on port 4000. Open http://localhost:3000/users to see results',
     );
   })
   .catch((error) => console.log(error));

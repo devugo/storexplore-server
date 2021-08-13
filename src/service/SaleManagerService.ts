@@ -1,37 +1,130 @@
 import { getRepository } from 'typeorm';
-import { Response } from 'express';
-import { notFoundError, serverError } from '../helper/throw-error';
-import { notFoundErrorMessage } from '../helper/get-error-message';
-import { ERROR_CODE } from '../constant/ERROR_CODE';
+// import { notFoundErrorMessage } from '../helper/get-error-message';
 import { SaleManager } from '../entity/SaleManager';
 import { CreateSaleManagerDto } from '../dto/create-sale-manager';
+import { Store } from '../entity/Store';
+import { UserService } from './UserService';
+import { User } from '../entity/User';
+import { uploadHelper } from './uploadHelper';
+import { RoleType } from '../enum/RoleType';
 
-const notFoundErrMsg = (id: string): string =>
-  notFoundErrorMessage('Store Manger', id);
+// const notFoundErrMsg = (id: string): string =>
+//   notFoundErrorMessage('Store Manger', id);
 
 export class SaleManagerService {
   private saleManagerRepository = getRepository(SaleManager);
+  private userRepository = getRepository(User);
+  private userService = new UserService();
+
+  async get(store: Store): Promise<SaleManager[]> {
+    try {
+      const saleManagers = await this.saleManagerRepository.find({
+        store,
+      });
+
+      return saleManagers;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getOne(id: string, store: Store): Promise<SaleManager> {
+    try {
+      const saleManager = await this.saleManagerRepository.findOne({
+        where: { id, store },
+      });
+
+      return saleManager;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async create(
     createSaleManagerDto: CreateSaleManagerDto,
+    store: Store,
   ): Promise<SaleManager> {
-    const { firstname, lastname, othernames, dob, user, store } =
-      createSaleManagerDto;
-
-    const saleManager = this.saleManagerRepository.create({
-      firstname,
-      lastname,
-      othernames,
-      dob,
-      user,
-      store,
-    });
-
     try {
+      const { firstname, lastname, othernames, dob, email, password } =
+        createSaleManagerDto;
+
+      //  Register User
+      const user = await this.userService.register({
+        email,
+        password,
+        role: RoleType.SALE_REPRESENTATIVE,
+      });
+
+      const saleManager = this.saleManagerRepository.create({
+        firstname,
+        lastname,
+        othernames,
+        dob,
+        user,
+        store,
+      });
+
       await this.saleManagerRepository.save(saleManager);
       return saleManager;
-    } catch (err) {
-      throw err;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async update(
+    createSaleManagerDto: CreateSaleManagerDto,
+    user: User,
+  ): Promise<SaleManager> {
+    try {
+      const { firstname, lastname, othernames, dob } = createSaleManagerDto;
+
+      //  Get Sale Manager
+      const saleManager = await this.saleManagerRepository.findOne({
+        user,
+      });
+
+      if (saleManager) {
+        saleManager.firstname = firstname;
+        saleManager.lastname = lastname;
+        saleManager.othernames = othernames;
+        saleManager.dob = dob;
+      }
+
+      return this.saleManagerRepository.save(saleManager);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async delete(store: Store): Promise<any> {
+    try {
+      const saleManager = await this.saleManagerRepository.findOne({
+        where: { store },
+      });
+      const deleteSaleManager = await this.userRepository.remove(
+        saleManager.user,
+      );
+      return deleteSaleManager;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async uploadAvatar(file: string, user: User): Promise<SaleManager> {
+    try {
+      const saleManager = await this.saleManagerRepository.findOne({
+        where: { user },
+      });
+      const logoPath = await uploadHelper(file);
+
+      if (saleManager) {
+        saleManager.photo = logoPath;
+
+        await this.saleManagerRepository.save(saleManager);
+      }
+      return saleManager;
+    } catch (error) {
+      throw error;
     }
   }
 }
