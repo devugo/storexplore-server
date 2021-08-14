@@ -4,44 +4,26 @@ import {
   Column,
   UpdateDateColumn,
   CreateDateColumn,
-  OneToOne,
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
 import { Store } from './Store';
-import { User } from './User';
 
 @Entity()
-export class SaleManager {
+export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column()
-  firstname: string;
+  name: string;
 
   @Column()
-  lastname: string;
-
-  @Column()
-  othernames: string;
-
-  @Column()
-  dob: Date;
+  description?: string;
 
   @Column({ nullable: true })
-  photo?: string;
+  image?: string;
 
-  @Column({ default: true })
-  active: boolean;
-
-  @OneToOne(() => User, (user) => user.saleManager, {
-    eager: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn()
-  user: User;
-
-  @ManyToOne((_type) => Store, (store) => store.saleManagers, {
+  @ManyToOne((_type) => Store, (store) => store.products, {
     eager: false,
     onDelete: 'CASCADE',
   })

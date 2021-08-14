@@ -96,10 +96,31 @@ export class SaleManagerService {
     }
   }
 
-  async delete(store: Store): Promise<any> {
+  async activate(
+    id: string,
+    active: boolean,
+    store: Store,
+  ): Promise<SaleManager> {
+    try {
+      //  Get Sale Manager
+      const saleManager = await this.saleManagerRepository.findOne({
+        where: { store, id },
+      });
+
+      if (saleManager) {
+        saleManager.active = active;
+      }
+
+      return this.saleManagerRepository.save(saleManager);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async delete(id: string, store: Store): Promise<any> {
     try {
       const saleManager = await this.saleManagerRepository.findOne({
-        where: { store },
+        where: { store, id },
       });
       const deleteSaleManager = await this.userRepository.remove(
         saleManager.user,

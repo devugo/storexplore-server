@@ -1,5 +1,6 @@
 import { SaleManagerController } from '../controller/SaleManagerController';
 import { authenticate } from '../middleware/authenticate';
+import { activateSaleManagerValidation } from '../validation/activate-sale-manager-validation';
 import { createSaleManagerValidation } from '../validation/create-sale-manager-validation';
 
 export const SaleManagerRoutes = [
@@ -42,6 +43,14 @@ export const SaleManagerRoutes = [
     action: 'update',
     middleware: authenticate,
     validation: [],
+  },
+  {
+    method: 'patch',
+    route: '/sale-managers/:id',
+    controller: SaleManagerController,
+    action: 'activate',
+    middleware: authenticate,
+    validation: activateSaleManagerValidation,
   },
   {
     method: 'post',

@@ -9,6 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { IndustryType } from '../enum/IndustryType';
+import { Product } from './Product';
 import { SaleManager } from './SaleManager';
 import { User } from './User';
 
@@ -30,6 +31,11 @@ export class Store {
     eager: false,
   })
   saleManagers: SaleManager[];
+
+  @OneToMany((_type) => Product, (product) => product.store, {
+    eager: false,
+  })
+  products: Product[];
 
   @CreateDateColumn()
   createdAt: Date;

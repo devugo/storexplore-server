@@ -1,21 +1,15 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { StoreService } from '../service/StoreService';
 import { throwError } from '../helper/throw-error';
 import { User } from '../entity/User';
 
 import * as Formidable from 'formidable';
-import { uploadHelper } from '../service/uploadHelper';
 import { Store } from '../entity/Store';
 import { SaleManagerService } from '../service/SaleManagerService';
-import { CreateSaleManagerDto } from '../dto/create-sale-manager';
-import { UserService } from '../service/UserService';
 
 export class SaleManagerController {
-  private storeService = new StoreService();
   private saleManagerService = new SaleManagerService();
-  private userService = new UserService();
   private userRepository = getRepository(User);
   private storeRepository = getRepository(Store);
 
@@ -120,6 +114,36 @@ export class SaleManagerController {
     }
   }
 
+  async activate(request: Request, response: Response, next: NextFunction) {
+    const requestUser = request.user;
+    const id = request.params.id;
+
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+      return response.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const storeUser = await this.userRepository.findOne({
+        email: requestUser.email,
+      });
+      const store = await this.storeRepository.findOne({ user: storeUser });
+      if (id) {
+        return await this.saleManagerService.activate(
+          id,
+          request.body.active,
+          store,
+        );
+      }
+    } catch (error) {
+      const err = throwError(error);
+      return response.status(err.code).json({
+        message: err.message,
+        success: false,
+      });
+    }
+  }
+
   async delete(request: Request, response: Response, next: NextFunction) {
     const requestUser = request.user;
     const id = request.params.id;
@@ -131,7 +155,7 @@ export class SaleManagerController {
       const store = await this.storeRepository.findOne({ user: storeUser });
 
       if (id) {
-        const deleteManager = await this.saleManagerService.delete(store);
+        const deleteManager = await this.saleManagerService.delete(id, store);
 
         return deleteManager;
       }
