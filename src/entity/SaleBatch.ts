@@ -9,45 +9,38 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Sale } from './Sale';
+import { SaleManager } from './SaleManager';
 import { Store } from './Store';
 
 @Entity()
-export class Product {
+export class SaleBatch {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column()
-  name: string;
-
-  @Column()
-  description?: string;
+  date: Date;
 
   @Column({ default: true })
-  active?: boolean;
+  active: boolean;
 
-  @Column({ nullable: true })
-  imagePath?: string;
-
-  @Column()
-  quantity: string;
-
-  @Column()
-  costPrice: string;
-
-  @Column()
-  sellingPrice: string;
-
-  @OneToMany((_type) => Sale, (sale) => sale.product, {
-    eager: false,
-  })
-  sales: Sale[];
-
-  @ManyToOne((_type) => Store, (store) => store.products, {
+  @ManyToOne((_type) => Store, (store) => store.saleBatches, {
     eager: false,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
   store: Store;
+
+  @ManyToOne((_type) => SaleManager, (saleManager) => saleManager.saleBatches, {
+    eager: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  saleManager: SaleManager;
+
+  @OneToMany((_type) => Sale, (sale) => sale.saleBatch, {
+    eager: false,
+  })
+  sales: Sale[];
 
   @CreateDateColumn()
   createdAt: Date;

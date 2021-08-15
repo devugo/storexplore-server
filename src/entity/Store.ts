@@ -10,6 +10,8 @@ import {
 } from 'typeorm';
 import { IndustryType } from '../enum/IndustryType';
 import { Product } from './Product';
+import { Sale } from './Sale';
+import { SaleBatch } from './SaleBatch';
 import { SaleManager } from './SaleManager';
 import { User } from './User';
 
@@ -36,6 +38,16 @@ export class Store {
     eager: false,
   })
   products: Product[];
+
+  @OneToMany((_type) => Sale, (sale) => sale.store, {
+    eager: false,
+  })
+  sales: Sale[];
+
+  @OneToMany((_type) => SaleBatch, (saleBatch) => saleBatch.store, {
+    eager: false,
+  })
+  saleBatches: SaleBatch[];
 
   @CreateDateColumn()
   createdAt: Date;

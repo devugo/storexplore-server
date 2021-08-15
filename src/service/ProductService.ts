@@ -39,7 +39,7 @@ export class ProductService {
     store: Store,
   ): Promise<Product> {
     try {
-      const { name, description, image, costPrice, sellingPrice } =
+      const { name, description, image, costPrice, sellingPrice, quantity } =
         createProductDto;
 
       const imagePath = await uploadHelper(image);
@@ -50,6 +50,7 @@ export class ProductService {
         imagePath,
         costPrice,
         sellingPrice,
+        quantity,
         store,
       });
 

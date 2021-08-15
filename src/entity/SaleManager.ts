@@ -7,7 +7,10 @@ import {
   OneToOne,
   JoinColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
+import { Sale } from './Sale';
+import { SaleBatch } from './SaleBatch';
 import { Store } from './Store';
 import { User } from './User';
 
@@ -41,8 +44,18 @@ export class SaleManager {
   @JoinColumn()
   user: User;
 
-  @ManyToOne((_type) => Store, (store) => store.saleManagers, {
+  @OneToMany((_type) => Sale, (sale) => sale.saleManager, {
     eager: false,
+  })
+  sales: Sale[];
+
+  @OneToMany((_type) => SaleBatch, (saleBatch) => saleBatch.saleManager, {
+    eager: false,
+  })
+  saleBatches: SaleBatch[];
+
+  @ManyToOne((_type) => Store, (store) => store.saleManagers, {
+    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()

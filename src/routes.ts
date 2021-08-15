@@ -2,7 +2,9 @@ import { UserController } from './controller/UserController';
 import { authenticate } from './middleware/authenticate';
 import { AuthRoutes } from './route/auth';
 import { ProductRoutes } from './route/products';
+import { SaleBatchRoutes } from './route/sale-batches';
 import { SaleManagerRoutes } from './route/sale-manager';
+import { SaleRoutes } from './route/sales';
 import { StoreRoutes } from './route/store';
 
 export const Routes = [
@@ -10,6 +12,8 @@ export const Routes = [
   ...StoreRoutes,
   ...SaleManagerRoutes,
   ...ProductRoutes,
+  ...SaleBatchRoutes,
+  ...SaleRoutes,
   {
     method: 'get',
     route: '/users',
