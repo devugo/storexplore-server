@@ -20,8 +20,17 @@ export class Product {
   @Column()
   description?: string;
 
+  @Column({ default: true })
+  active?: boolean;
+
   @Column({ nullable: true })
-  image?: string;
+  imagePath?: string;
+
+  @Column()
+  costPrice: string;
+
+  @Column()
+  sellingPrice: string;
 
   @ManyToOne((_type) => Store, (store) => store.products, {
     eager: false,
