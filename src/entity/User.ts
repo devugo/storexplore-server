@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { RoleType } from '../enum/RoleType';
 import { SaleManager } from './SaleManager';
+import { StoreOwner } from './StoreOwner';
 
 @Entity()
 export class User {
@@ -29,6 +30,11 @@ export class User {
     onDelete: 'CASCADE',
   })
   saleManager: SaleManager;
+
+  @OneToOne(() => StoreOwner, (storeOwner) => storeOwner.user, {
+    onDelete: 'CASCADE',
+  })
+  storeOwner: StoreOwner;
 
   @CreateDateColumn()
   createdAt: Date;

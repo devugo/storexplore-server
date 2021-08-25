@@ -8,18 +8,6 @@ import * as dotenv from 'dotenv';
 // get config vars
 dotenv.config();
 import { Routes } from './routes';
-import cloudinaryV2 from './cloudinary.config';
-
-// import * as multer from 'multer';
-
-// const fileStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'images');
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, file.filename + '-' + file.orig)
-//   }
-// })
 
 createConnection()
   .then(async (connection) => {
@@ -27,7 +15,6 @@ createConnection()
     app.use(cors());
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
-    // app.use(multer({ dest: 'images' }).single('image'));
 
     // register express routes from defined application routes
     Routes.forEach((route) => {
@@ -66,24 +53,8 @@ createConnection()
     // start express server
     app.listen(4000);
 
-    // insert new users for test
-    // await connection.manager.save(
-    //     connection.manager.create(User, {
-    //       firstName: 'Timber',
-    //       lastName: 'Saw',
-    //       age: 27,
-    //     }),
-    // );
-    // await connection.manager.save(
-    //     connection.manager.create(User, {
-    //       firstName: 'Phantom',
-    //       lastName: 'Assassin',
-    //       age: 24,
-    //     }),
-    // );
-
     console.log(
-      'Express server has started on port 4000. Open http://localhost:3000/users to see results',
+      'Express server has started on port 4000. Open http://localhost:4000 to begin',
     );
   })
   .catch((error) => console.log(error));

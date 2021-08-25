@@ -1,5 +1,4 @@
 import cloudinaryV2 from '../cloudinary.config';
-import { throwError } from '../helper/throw-error';
 
 export const uploadHelper = async (path: string) => {
   try {
@@ -13,8 +12,6 @@ export const uploadHelper = async (path: string) => {
       })
       .catch(function (err) {
         throw err;
-        // const error = throwError(err, err.message);
-        // return error;
       });
 
     return upload;

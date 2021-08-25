@@ -14,13 +14,12 @@ export class UserService {
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(password, salt);
 
-    const user = this.userRepository.create({
-      email,
-      password: hashPassword,
-      role: role ? role : RoleType.ADMIN,
-    });
-
     try {
+      const user = this.userRepository.create({
+        email,
+        password: hashPassword,
+        role: role ? role : RoleType.ADMIN,
+      });
       await this.userRepository.save(user);
       return user;
     } catch (err) {
@@ -38,7 +37,7 @@ export class UserService {
       const accessToken = await jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: '18000s',
       });
-      return { accessToken, email: user.email };
+      return { accessToken, email: user.email, role: user.role };
     } else {
       throw new Error('Invalid credentials');
     }

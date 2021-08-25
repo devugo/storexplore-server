@@ -5,7 +5,7 @@ import { CreateSaleManagerDto } from '../dto/create-sale-manager';
 import { Store } from '../entity/Store';
 import { UserService } from './UserService';
 import { User } from '../entity/User';
-import { uploadHelper } from './uploadHelper';
+import { uploadHelper } from '../helper/uploadHelper';
 import { RoleType } from '../enum/RoleType';
 
 // const notFoundErrMsg = (id: string): string =>

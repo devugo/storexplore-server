@@ -6,21 +6,24 @@ import { CreateUserDto } from '../dto/create-user-dto';
 import { validationResult } from 'express-validator';
 import { throwError } from '../helper/throw-error';
 import { ERROR_CODE } from '../constant/ERROR_CODE';
+import { StoreOwnerService } from '../service/StoreOwnerService';
 
 export class UserController {
   private userRepository = getRepository(User);
   private userService = new UserService();
+  private storeOwnerService = new StoreOwnerService();
 
   async register(request: Request, response: Response, next: NextFunction) {
-    const { email, password }: CreateUserDto = request.body;
+    const { email, password, name }: CreateUserDto = request.body;
 
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
       return response.status(400).json({ errors: errors.array() });
     }
     try {
-      const create = await this.userService.register({ email, password });
-      return create;
+      const user = await this.userService.register({ email, password });
+      await this.storeOwnerService.create({ name }, user);
+      return user;
     } catch (error) {
       const err = throwError(error);
       return response.status(err.code).json({

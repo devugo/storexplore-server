@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 import { Store } from '../entity/Store';
-import { uploadHelper } from './uploadHelper';
+import { uploadHelper } from '../helper/uploadHelper';
 import { Product } from '../entity/Product';
 import { CreateProductDto } from '../dto/create-product-dto';
 

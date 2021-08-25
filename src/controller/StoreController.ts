@@ -8,7 +8,7 @@ import { User } from '../entity/User';
 import { successCreationMessage } from '../helper/get-error-message';
 
 import * as Formidable from 'formidable';
-import { uploadHelper } from '../service/uploadHelper';
+import { uploadHelper } from '../helper/uploadHelper';
 
 export class StoreController {
   private storeService = new StoreService();
