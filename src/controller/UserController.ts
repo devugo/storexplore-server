@@ -7,6 +7,7 @@ import { validationResult } from 'express-validator';
 import { throwError } from '../helper/throw-error';
 import { ERROR_CODE } from '../constant/ERROR_CODE';
 import { StoreOwnerService } from '../service/StoreOwnerService';
+import { validationErrorMessage } from '../helper/validation-error-message';
 
 export class UserController {
   private userRepository = getRepository(User);
@@ -18,16 +19,19 @@ export class UserController {
 
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      return response.status(400).json({ errors: errors.array() });
+      return response
+        .status(400)
+        .json({ message: validationErrorMessage(errors.array()) });
     }
     try {
       const user = await this.userService.register({ email, password });
       await this.storeOwnerService.create({ name }, user);
-      return user;
+      return response.status(201).json(user);
     } catch (error) {
       const err = throwError(error);
       return response.status(err.code).json({
-        message: err.message,
+        message:
+          err.code === 409 ? 'User with the email already exist' : err.message,
         success: false,
       });
     }
