@@ -16,6 +16,6 @@ export const AuthRoutes = [
     controller: UserController,
     action: 'login',
     middleware: null,
-    validation: createUserValidation,
+    validation: [],
   },
 ];

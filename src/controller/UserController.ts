@@ -39,11 +39,6 @@ export class UserController {
 
   async login(request: Request, response: Response, next: NextFunction) {
     const { email, password }: CreateUserDto = request.body;
-
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-      return response.status(400).json({ errors: errors.array() });
-    }
     try {
       return await this.userService.login({ email, password });
     } catch (error) {
