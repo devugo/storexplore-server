@@ -37,7 +37,7 @@ export class UserService {
       const accessToken = await jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE_DURATION,
       });
-      return { accessToken, email: user.email, role: user.role };
+      return { accessToken, email: user.email, role: user.role, id: user.id };
     } else {
       throw new Error('Invalid credentials');
     }

@@ -52,7 +52,7 @@ export class SaleManagerService {
       const user = await this.userService.register({
         email,
         password,
-        role: RoleType.SALE_REPRESENTATIVE,
+        role: RoleType.SALE_MANAGER,
       });
 
       const saleManager = this.saleManagerRepository.create({
