@@ -8,14 +8,16 @@ import { throwError } from '../helper/throw-error';
 import { ERROR_CODE } from '../constant/ERROR_CODE';
 import { StoreOwnerService } from '../service/StoreOwnerService';
 import { validationErrorMessage } from '../helper/validation-error-message';
+import { StoreService } from '../service/StoreService';
 
 export class UserController {
   private userRepository = getRepository(User);
   private userService = new UserService();
   private storeOwnerService = new StoreOwnerService();
+  private storeService = new StoreService();
 
   async register(request: Request, response: Response, next: NextFunction) {
-    const { email, password, name }: CreateUserDto = request.body;
+    const { email, password, name, storeName }: CreateUserDto = request.body;
 
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
@@ -25,9 +27,17 @@ export class UserController {
     }
     try {
       const user = await this.userService.register({ email, password });
+      //  Create store owner
       await this.storeOwnerService.create({ name }, user);
+
+      //  Create store
+      await this.storeService.create({
+        name: storeName,
+        user,
+      });
       return response.status(201).json(user);
     } catch (error) {
+      console.log(error.message);
       const err = throwError(error);
       return response.status(err.code).json({
         message:

@@ -14,11 +14,13 @@ export class StoreService {
   private storeRepository = getRepository(Store);
 
   async create(createStoreDto: CreateStoreDto): Promise<Store> {
-    const { name, industry, user } = createStoreDto;
+    const { name, industry, address, defaultPassword, user } = createStoreDto;
 
     const store = this.storeRepository.create({
       name,
       industry,
+      address,
+      defaultPassword,
       user,
     });
 
@@ -55,7 +57,7 @@ export class StoreService {
     user: User,
   ): Promise<Store> {
     try {
-      const { name, industry } = createStoreDto;
+      const { name, industry, address, defaultPassword } = createStoreDto;
       const store = await this.storeRepository.findOne({
         where: { id, user },
       });
@@ -63,6 +65,8 @@ export class StoreService {
       if (store) {
         store.name = name;
         store.industry = industry;
+        store.address = address;
+        store.defaultPassword = defaultPassword;
 
         await this.storeRepository.save(store);
         return store;

@@ -23,8 +23,14 @@ export class Store {
   @Column()
   name: string;
 
-  @Column()
-  industry: IndustryType;
+  @Column({ nullable: true })
+  address?: string;
+
+  @Column({ nullable: true })
+  defaultPassword?: string;
+
+  @Column({ nullable: true })
+  industry?: IndustryType;
 
   @Column({ nullable: true })
   logoPath?: string;

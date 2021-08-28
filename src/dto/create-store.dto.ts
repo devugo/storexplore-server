@@ -3,6 +3,9 @@ import { IndustryType } from '../enum/IndustryType';
 
 export type CreateStoreDto = {
   name: string;
-  industry: IndustryType;
+  industry?: IndustryType;
   user?: User;
+  address?: string;
+  defaultPassword?: string;
+  image?: string;
 };

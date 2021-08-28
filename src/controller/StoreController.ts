@@ -9,25 +9,31 @@ import { successCreationMessage } from '../helper/get-error-message';
 
 import * as Formidable from 'formidable';
 import { uploadHelper } from '../helper/uploadHelper';
+import { validationErrorMessage } from '../helper/validation-error-message';
 
 export class StoreController {
   private storeService = new StoreService();
   private userRepository = getRepository(User);
 
   async create(request: Request, response: Response, next: NextFunction) {
-    const { name, industry }: CreateStoreDto = request.body;
+    const { name, industry, address, defaultPassword }: CreateStoreDto =
+      request.body;
 
     const { email } = request.user;
     const user = await this.userRepository.findOne({ email });
 
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      return response.status(400).json({ errors: errors.array() });
+      return response
+        .status(400)
+        .json({ message: validationErrorMessage(errors.array()) });
     }
     try {
       const create = await this.storeService.create({
         name,
         industry,
+        address,
+        defaultPassword,
         user,
       });
       return response.status(201).json({
@@ -58,7 +64,8 @@ export class StoreController {
   }
 
   async update(request: Request, response: Response, next: NextFunction) {
-    const { name, industry }: CreateStoreDto = request.body;
+    const { name, industry, address, defaultPassword }: CreateStoreDto =
+      request.body;
     const requestUser = request.user;
     const id = request.params.id;
 
@@ -76,7 +83,7 @@ export class StoreController {
         return await this.storeService.update(
           response,
           id,
-          { name, industry },
+          { name, industry, address, defaultPassword },
           user,
         );
       }
