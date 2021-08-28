@@ -9,6 +9,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
+import { GenderType } from '../enum/GenderType';
 import { Sale } from './Sale';
 import { SaleBatch } from './SaleBatch';
 import { Store } from './Store';
@@ -25,8 +26,14 @@ export class SaleManager {
   @Column()
   lastname: string;
 
+  @Column({ nullable: true })
+  othernames?: string;
+
+  @Column({ nullable: true })
+  address?: string;
+
   @Column()
-  othernames: string;
+  gender: GenderType;
 
   @Column()
   dob: Date;

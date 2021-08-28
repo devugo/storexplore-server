@@ -44,9 +44,18 @@ export class SaleManagerService {
     createSaleManagerDto: CreateSaleManagerDto,
     store: Store,
   ): Promise<SaleManager> {
+    console.log({ createSaleManagerDto });
     try {
-      const { firstname, lastname, othernames, dob, email, password } =
-        createSaleManagerDto;
+      const {
+        firstname,
+        lastname,
+        othernames,
+        gender,
+        address,
+        dob,
+        email,
+        password,
+      } = createSaleManagerDto;
 
       //  Register User
       const user = await this.userService.register({
@@ -60,6 +69,8 @@ export class SaleManagerService {
         lastname,
         othernames,
         dob,
+        gender,
+        address,
         user,
         store,
       });

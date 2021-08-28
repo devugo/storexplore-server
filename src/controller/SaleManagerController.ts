@@ -7,6 +7,7 @@ import { User } from '../entity/User';
 import * as Formidable from 'formidable';
 import { Store } from '../entity/Store';
 import { SaleManagerService } from '../service/SaleManagerService';
+import { validationErrorMessage } from '../helper/validation-error-message';
 
 export class SaleManagerController {
   private saleManagerService = new SaleManagerService();
@@ -73,7 +74,9 @@ export class SaleManagerController {
 
       const errors = validationResult(request);
       if (!errors.isEmpty()) {
-        return response.status(400).json({ errors: errors.array() });
+        return response
+          .status(400)
+          .json({ message: validationErrorMessage(errors.array()) });
       }
 
       //  Create Sale Manager
@@ -82,7 +85,7 @@ export class SaleManagerController {
         store,
       );
 
-      return saleManager;
+      return response.status(201).json(saleManager);
     } catch (error) {
       const err = throwError(error);
       return response.status(err.code).json({
