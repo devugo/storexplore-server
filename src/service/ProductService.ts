@@ -14,7 +14,6 @@ export class ProductService {
     filterDto: GetProductsFilterDto,
   ): Promise<{ count: number; products: Product[] }> {
     const { page } = filterDto;
-    console.log({ filterDto, page });
     try {
       const query = this.productRepository.createQueryBuilder('product');
       query.andWhere('product.storeId = :store', {
