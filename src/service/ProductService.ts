@@ -67,7 +67,8 @@ export class ProductService {
     store: Store,
   ): Promise<Product> {
     try {
-      const { name, description, costPrice, sellingPrice } = createProductDto;
+      const { name, description, costPrice, sellingPrice, quantity } =
+        createProductDto;
 
       //  Get Product
       const product = await this.productRepository.findOne({
@@ -79,6 +80,7 @@ export class ProductService {
         product.description = description;
         product.costPrice = costPrice;
         product.sellingPrice = sellingPrice;
+        product.quantity = quantity;
       }
 
       return this.productRepository.save(product);

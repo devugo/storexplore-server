@@ -7,6 +7,7 @@ import { User } from '../entity/User';
 import * as Formidable from 'formidable';
 import { Store } from '../entity/Store';
 import { ProductService } from '../service/ProductService';
+import { validationErrorMessage } from '../helper/validation-error-message';
 
 export class ProductController {
   private productService = new ProductService();
@@ -102,7 +103,9 @@ export class ProductController {
 
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      return response.status(400).json({ errors: errors.array() });
+      return response
+        .status(400)
+        .json({ message: validationErrorMessage(errors.array()) });
     }
 
     try {
