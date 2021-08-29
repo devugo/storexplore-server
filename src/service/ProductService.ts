@@ -3,20 +3,31 @@ import { Store } from '../entity/Store';
 import { uploadHelper } from '../helper/uploadHelper';
 import { Product } from '../entity/Product';
 import { CreateProductDto } from '../dto/create-product-dto';
-
-// const notFoundErrMsg = (id: string): string =>
-//   notFoundErrorMessage('Store Manger', id);
+import { GetProductsFilterDto } from '../dto/get-products-filter.dto';
+import { PAGINATION } from '../constant/PAGINATION';
 
 export class ProductService {
   private productRepository = getRepository(Product);
 
-  async get(store: Store): Promise<Product[]> {
+  async get(
+    store: Store,
+    filterDto: GetProductsFilterDto,
+  ): Promise<{ count: number; products: Product[] }> {
+    const { page } = filterDto;
+    console.log({ filterDto, page });
     try {
-      const products = await this.productRepository.find({
-        store,
+      const query = this.productRepository.createQueryBuilder('product');
+      query.andWhere('product.storeId = :store', {
+        store: store.id,
       });
 
-      return products;
+      if (page) {
+        query.skip(PAGINATION.itemsPerPage * (parseInt(page) - 1));
+      }
+      const count = await query.getCount();
+      const products = await query.take(PAGINATION.itemsPerPage).getMany();
+
+      return { count, products };
     } catch (error) {
       throw error;
     }

@@ -27,10 +27,11 @@ export class ProductController {
       }
 
       //  Get products
-      const products = await this.productService.get(store);
+      const products = await this.productService.get(store, request.query);
 
       return products;
     } catch (error) {
+      console.log(error.message);
       const err = throwError(error);
       return response.status(err.code).json({
         message: err.message,
