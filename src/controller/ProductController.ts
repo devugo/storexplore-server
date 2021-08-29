@@ -8,18 +8,30 @@ import * as Formidable from 'formidable';
 import { Store } from '../entity/Store';
 import { ProductService } from '../service/ProductService';
 import { validationErrorMessage } from '../helper/validation-error-message';
+import { SaleManager } from '../entity/SaleManager';
 
 export class ProductController {
   private productService = new ProductService();
   private userRepository = getRepository(User);
   private storeRepository = getRepository(Store);
+  private saleManagerRepository = getRepository(SaleManager);
 
   async get(request: Request, response: Response, next: NextFunction) {
     const { email } = request.user;
 
     try {
       const storeUser = await this.userRepository.findOne({ email });
-      const store = await this.storeRepository.findOne({ user: storeUser });
+      let store;
+      if (storeUser.role === 'ADMIN') {
+        store = await this.storeRepository.findOne({ user: storeUser });
+      } else {
+        const saleManager = await this.saleManagerRepository.findOne({
+          user: storeUser,
+        });
+        if (saleManager) {
+          store = saleManager.store;
+        }
+      }
 
       const errors = validationResult(request);
       if (!errors.isEmpty()) {
@@ -31,7 +43,6 @@ export class ProductController {
 
       return products;
     } catch (error) {
-      console.log(error.message);
       const err = throwError(error);
       return response.status(err.code).json({
         message: err.message,
