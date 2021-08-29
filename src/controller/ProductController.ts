@@ -71,11 +71,6 @@ export class ProductController {
       const storeUser = await this.userRepository.findOne({ email });
       const store = await this.storeRepository.findOne({ user: storeUser });
 
-      // const errors = validationResult(request);
-      // if (!errors.isEmpty()) {
-      //   return response.status(400).json({ errors: errors.array() });
-      // }
-
       // parse a file upload
       const form = new Formidable();
 
@@ -91,7 +86,7 @@ export class ProductController {
       //  Create Product
       const product = await this.productService.create(data, store);
 
-      return product;
+      return response.status(201).json(product);
     } catch (error) {
       const err = throwError(error);
       return response.status(err.code).json({

@@ -44,7 +44,6 @@ export class SaleManagerService {
     createSaleManagerDto: CreateSaleManagerDto,
     store: Store,
   ): Promise<SaleManager> {
-    console.log({ createSaleManagerDto });
     try {
       const {
         firstname,

@@ -37,7 +37,6 @@ export class UserController {
       });
       return response.status(201).json(user);
     } catch (error) {
-      console.log(error.message);
       const err = throwError(error);
       return response.status(err.code).json({
         message:
