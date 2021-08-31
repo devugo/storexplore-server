@@ -6,8 +6,10 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { RoleType } from '../enum/RoleType';
+import { Chat } from './Chat';
 import { SaleManager } from './SaleManager';
 import { StoreOwner } from './StoreOwner';
 
@@ -35,6 +37,16 @@ export class User {
     onDelete: 'CASCADE',
   })
   storeOwner: StoreOwner;
+
+  @OneToMany((_type) => Chat, (chat) => chat.from, {
+    eager: false,
+  })
+  chatsFrom: Chat[];
+
+  @OneToMany((_type) => Chat, (chat) => chat.to, {
+    eager: false,
+  })
+  chatsTo: Chat[];
 
   @CreateDateColumn()
   createdAt: Date;
