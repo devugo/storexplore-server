@@ -50,16 +50,23 @@ export class ChatService {
       this.chatRepository.create({
         message,
       });
-      const userFrom = await this.userRepository.findOne({ id: from });
+      const userFrom = await this.userRepository.findOne({
+        where: { id: from },
+      });
+      const userTo = await this.userRepository.findOne({
+        where: { id: to },
+      });
 
-      // const chat = this.chatRepository.create({
-      //   message,
-      //   from,
-      //   to,
-      // });
+      if (userFrom && userTo) {
+        const chat = this.chatRepository.create({
+          message,
+          from: userFrom,
+          to: userTo,
+        });
 
-      // await this.chatRepository.save(chat);
-      // return chat;
+        await this.chatRepository.save(chat);
+        return chat;
+      }
     } catch (error) {
       throw error;
     }

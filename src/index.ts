@@ -11,6 +11,7 @@ const { Server } = SocketIO;
 // get config vars
 dotenv.config();
 import { Routes } from './routes';
+import { ChatService } from './service/ChatService';
 
 createConnection()
   .then(async (connection) => {
@@ -19,6 +20,7 @@ createConnection()
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
+    const chatService = new ChatService();
     const server = http.createServer(app);
     const io = new Server(server, {
       cors: {
@@ -29,11 +31,11 @@ createConnection()
 
     io.on('connection', (socket: any) => {
       console.log('Connected');
-      console.log('a User connected');
 
       socket.on('chat message', ({ from, to, message }) => {
         console.log({ from, to, message });
-        io.emit('chat message', message);
+        io.emit('chat message', { from, to, message });
+        chatService.create({ from, to, message });
       });
     });
 

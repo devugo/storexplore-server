@@ -61,7 +61,9 @@ export class Store {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user.store, {
+    eager: true,
+  })
   @JoinColumn()
   user: User;
 }

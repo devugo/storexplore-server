@@ -11,6 +11,7 @@ import {
 import { RoleType } from '../enum/RoleType';
 import { Chat } from './Chat';
 import { SaleManager } from './SaleManager';
+import { Store } from './Store';
 import { StoreOwner } from './StoreOwner';
 
 @Entity()
@@ -47,6 +48,9 @@ export class User {
     eager: false,
   })
   chatsTo: Chat[];
+
+  @OneToOne(() => Store, (store) => store.user)
+  store: Store;
 
   @CreateDateColumn()
   createdAt: Date;

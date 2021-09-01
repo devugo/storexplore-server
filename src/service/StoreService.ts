@@ -6,6 +6,7 @@ import { notFoundError, serverError } from '../helper/throw-error';
 import { User } from '../entity/User';
 import { notFoundErrorMessage } from '../helper/get-error-message';
 import { ERROR_CODE } from '../constant/ERROR_CODE';
+import { RoleType } from '../enum/RoleType';
 
 const notFoundErrMsg = (id: string): string =>
   notFoundErrorMessage('Store', id);
@@ -34,9 +35,12 @@ export class StoreService {
 
   async single(response: Response, user: User): Promise<Store> {
     try {
-      const store = await this.storeRepository.findOne({
-        where: { user },
-      });
+      let store;
+      if (user.role === RoleType.ADMIN) {
+        store = await this.storeRepository.findOne({
+          where: { user },
+        });
+      }
 
       if (!store) {
         return notFoundError(response, 'Store doesnt exist');
