@@ -1,6 +1,7 @@
 import { UserController } from './controller/UserController';
 import { authenticate } from './middleware/authenticate';
 import { AuthRoutes } from './route/auth';
+import { ChatRoutes } from './route/chats';
 import { ProductRoutes } from './route/products';
 import { SaleBatchRoutes } from './route/sale-batches';
 import { SaleManagerRoutes } from './route/sale-manager';
@@ -14,6 +15,7 @@ export const Routes = [
   ...ProductRoutes,
   ...SaleBatchRoutes,
   ...SaleRoutes,
+  ...ChatRoutes,
   {
     method: 'get',
     route: '/users',
