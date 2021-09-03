@@ -9,6 +9,7 @@ import { Store } from '../entity/Store';
 import { ProductService } from '../service/ProductService';
 import { validationErrorMessage } from '../helper/validation-error-message';
 import { SaleManager } from '../entity/SaleManager';
+import { RoleType } from '../enum/RoleType';
 
 export class ProductController {
   private productService = new ProductService();
@@ -20,22 +21,17 @@ export class ProductController {
     const { email } = request.user;
 
     try {
-      const storeUser = await this.userRepository.findOne({ email });
+      const user = await this.userRepository.findOne({ email });
       let store;
-      if (storeUser.role === 'ADMIN') {
-        store = await this.storeRepository.findOne({ user: storeUser });
+      if (user.role === RoleType.ADMIN) {
+        store = await this.storeRepository.findOne({ user });
       } else {
         const saleManager = await this.saleManagerRepository.findOne({
-          user: storeUser,
+          user,
         });
         if (saleManager) {
           store = saleManager.store;
         }
-      }
-
-      const errors = validationResult(request);
-      if (!errors.isEmpty()) {
-        return response.status(400).json({ errors: errors.array() });
       }
 
       //  Get products

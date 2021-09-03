@@ -19,12 +19,15 @@ export class ProductService {
       query.andWhere('product.storeId = :store', {
         store: store.id,
       });
+      let products;
 
       if (page) {
         query.skip(PAGINATION.itemsPerPage * (parseInt(page) - 1));
+        products = await query.take(PAGINATION.itemsPerPage).getMany();
+      } else {
+        products = await query.getMany();
       }
       const count = await query.getCount();
-      const products = await query.take(PAGINATION.itemsPerPage).getMany();
 
       return { count, products };
     } catch (error) {

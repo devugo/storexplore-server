@@ -23,6 +23,9 @@ export class Sale {
   @Column()
   quantity: string;
 
+  @Column()
+  date: Date;
+
   @ManyToOne((_type) => Product, (product) => product.sales, {
     eager: false,
     onDelete: 'CASCADE',

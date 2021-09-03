@@ -5,6 +5,8 @@ import { Sale } from '../entity/Sale';
 import { CreateSaleDto } from '../dto/create-sale-dto';
 import { SaleManager } from '../entity/SaleManager';
 import { SaleBatch } from '../entity/SaleBatch';
+import { GetSalesFilterDto } from '../dto/get-sales.dto';
+import { User } from '../entity/User';
 
 // const notFoundErrMsg = (id: string): string =>
 //   notFoundErrorMessage('Store Manger', id);
@@ -13,12 +15,46 @@ export class SaleService {
   private saleRepository = getRepository(Sale);
   private productRepository = getRepository(Product);
   private saleBatchRepository = getRepository(SaleBatch);
+  private userRepository = getRepository(User);
+  private saleManagerRepository = getRepository(SaleManager);
 
-  async get(store: Store): Promise<Sale[]> {
+  async get(
+    store: Store,
+    saleManager: SaleManager,
+    filterDto: GetSalesFilterDto,
+  ): Promise<Sale[]> {
+    const { date } = filterDto;
     try {
-      const sales = await this.saleRepository.find({
-        store,
-      });
+      let sales;
+      if (date) {
+        if (saleManager) {
+          sales = await this.saleRepository.find({
+            where: {
+              store,
+              saleManager,
+              date: date,
+            },
+          });
+        } else {
+          sales = await this.saleRepository.find({
+            where: {
+              store,
+              date: date,
+            },
+          });
+        }
+      } else {
+        if (saleManager) {
+          sales = await this.saleRepository.find({
+            store,
+            saleManager,
+          });
+        } else {
+          sales = await this.saleRepository.find({
+            store,
+          });
+        }
+      }
 
       return sales;
     } catch (error) {
@@ -62,45 +98,64 @@ export class SaleService {
     }
   }
 
-  async create(
-    createSaleDto: CreateSaleDto,
-    saleManager: SaleManager,
-  ): Promise<Sale> {
+  async create(createSaleDto: {
+    from: string;
+    sale: any;
+  }): Promise<Sale | any> {
     try {
-      const { soldAt, quantity, product } = createSaleDto;
-      const getProduct = await this.productRepository.findOne(product);
+      const {
+        from,
+        sale: { productId, soldAt, quantity },
+      } = createSaleDto;
+      const user = await this.userRepository.findOne({ where: { id: from } });
+      const getProduct = await this.productRepository.findOne(productId);
+      const saleManager = await this.saleManagerRepository.findOne({
+        where: { user },
+      });
 
       if (getProduct) {
-        let batch;
-        // Check if batch has been created
-        const batchExist = await this.saleBatchRepository.findOne({
-          date: new Date(),
-          saleManager,
-        });
-
-        if (batchExist) {
-          batch = batchExist;
-        } else {
-          // Create new batch
-          const newBatch = await this.saleBatchRepository.create({
+        if (getProduct.quantity >= quantity) {
+          let batch;
+          // Check if batch has been created
+          const batchExist = await this.saleBatchRepository.findOne({
             date: new Date(),
             saleManager,
-            store: saleManager.store,
           });
 
-          batch = newBatch;
-        }
-        const sale = this.saleRepository.create({
-          soldAt,
-          product: getProduct,
-          quantity,
-          store: saleManager.store,
-          saleManager,
-          saleBatch: batch,
-        });
+          if (batchExist) {
+            batch = batchExist;
+          } else {
+            // Create new batch
+            const newBatch = await this.saleBatchRepository.create({
+              date: new Date(),
+              saleManager,
+              store: saleManager.store,
+            });
 
-        await this.saleRepository.save(sale);
-        return sale;
+            batch = newBatch;
+          }
+          const sale = this.saleRepository.create({
+            soldAt,
+            product: getProduct,
+            quantity,
+            store: saleManager.store,
+            saleManager,
+            saleBatch: batch,
+            date: new Date(),
+          });
+
+          await this.saleRepository.save(sale);
+
+          // Update Product quantity
+          if (getProduct) {
+            getProduct.quantity = `${parseInt(getProduct.quantity) - quantity}`;
+
+            this.productRepository.save(getProduct);
+          }
+          return sale;
+        } else {
+          return { error: `There are only ${getProduct.quantity} items left` };
+        }
       }
     } catch (error) {
       throw error;

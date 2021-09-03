@@ -35,18 +35,6 @@ export class ChatService {
     }
   }
 
-  // async getOne(id: string, store: Store): Promise<Product> {
-  //   try {
-  //     const product = await this.productRepository.findOne({
-  //       where: { id, store },
-  //     });
-
-  //     return product;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
-
   async create(createChatDto: CreateChatDto): Promise<Chat> {
     try {
       const { message, from, to } = createChatDto;

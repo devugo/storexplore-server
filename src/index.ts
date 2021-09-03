@@ -12,6 +12,7 @@ const { Server } = SocketIO;
 dotenv.config();
 import { Routes } from './routes';
 import { ChatService } from './service/ChatService';
+import { SaleService } from './service/SaleService';
 
 createConnection()
   .then(async (connection) => {
@@ -21,6 +22,7 @@ createConnection()
     app.use(bodyParser.urlencoded({ extended: true }));
 
     const chatService = new ChatService();
+    const saleService = new SaleService();
     const server = http.createServer(app);
     const io = new Server(server, {
       cors: {
@@ -36,6 +38,15 @@ createConnection()
         console.log({ from, to, message });
         io.emit('chat message', { from, to, message });
         chatService.create({ from, to, message });
+      });
+
+      socket.on('add sale', async ({ from, sale }) => {
+        console.log('Loging add sale socket...');
+        const create = await saleService.create({ from, sale });
+        if (create.error) {
+        } else {
+          io.emit('add sale', { from, sale: { ...sale, id: create.id } });
+        }
       });
     });
 
