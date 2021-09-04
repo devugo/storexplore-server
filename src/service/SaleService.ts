@@ -30,26 +30,22 @@ export class SaleService {
         store: store.id,
       });
       if (date) {
-        if (saleManager) {
-          query.andWhere('sale.saleManagerId = :sm AND sale.date = :date', {
-            sm: saleManager.id,
-            date: `${date} 01:00:00`,
-          });
-        }
-      } else {
-        if (saleManager) {
-          query.andWhere('sale.saleManagerId = :sm', {
-            sm: saleManager.id,
-          });
-        }
+        query.andWhere('sale.date = :date', {
+          date: `${date} 01:00:00`,
+        });
       }
+      if (saleManager) {
+        query.andWhere('sale.saleManagerId = :sm', {
+          sm: saleManager.id,
+        });
+      }
+      query.leftJoinAndSelect('sale.product', 'product');
+      query.leftJoinAndSelect('sale.saleManager', 'sale_manager');
 
       if (page) {
         query.skip(PAGINATION.itemsPerPage * (parseInt(page) - 1));
-        query.leftJoinAndSelect('sale.product', 'product');
         sales = await query.take(PAGINATION.itemsPerPage).getMany();
       } else {
-        query.leftJoinAndSelect('sale.product', 'product');
         sales = await query.getMany();
       }
       const count = await query.getCount();

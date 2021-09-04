@@ -21,11 +21,6 @@ export class SaleManagerController {
       const storeUser = await this.userRepository.findOne({ email });
       const store = await this.storeRepository.findOne({ user: storeUser });
 
-      const errors = validationResult(request);
-      if (!errors.isEmpty()) {
-        return response.status(400).json({ errors: errors.array() });
-      }
-
       //  Create Sale Managers
       const saleManagers = await this.saleManagerService.get(store);
 
