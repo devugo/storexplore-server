@@ -2,14 +2,13 @@ import { getRepository } from 'typeorm';
 import { Store } from '../entity/Store';
 import { Product } from '../entity/Product';
 import { Sale } from '../entity/Sale';
-import { CreateSaleDto } from '../dto/create-sale-dto';
 import { SaleManager } from '../entity/SaleManager';
 import { SaleBatch } from '../entity/SaleBatch';
 import { GetSalesFilterDto } from '../dto/get-sales.dto';
 import { User } from '../entity/User';
+import { PAGINATION } from '../constant/PAGINATION';
 
-// const notFoundErrMsg = (id: string): string =>
-//   notFoundErrorMessage('Store Manger', id);
+const moment = require('moment');
 
 export class SaleService {
   private saleRepository = getRepository(Sale);
@@ -22,41 +21,40 @@ export class SaleService {
     store: Store,
     saleManager: SaleManager,
     filterDto: GetSalesFilterDto,
-  ): Promise<Sale[]> {
-    const { date } = filterDto;
+  ): Promise<{ count: number; sales: Sale[] }> {
+    const { date, page } = filterDto;
     try {
       let sales;
+      const query = this.saleRepository.createQueryBuilder('sale');
+      query.andWhere('sale.storeId = :store', {
+        store: store.id,
+      });
       if (date) {
         if (saleManager) {
-          sales = await this.saleRepository.find({
-            where: {
-              store,
-              saleManager,
-              date: date,
-            },
-          });
-        } else {
-          sales = await this.saleRepository.find({
-            where: {
-              store,
-              date: date,
-            },
+          query.andWhere('sale.saleManagerId = :sm AND sale.date = :date', {
+            sm: saleManager.id,
+            date: `${date} 01:00:00`,
           });
         }
       } else {
         if (saleManager) {
-          sales = await this.saleRepository.find({
-            store,
-            saleManager,
-          });
-        } else {
-          sales = await this.saleRepository.find({
-            store,
+          query.andWhere('sale.saleManagerId = :sm', {
+            sm: saleManager.id,
           });
         }
       }
 
-      return sales;
+      if (page) {
+        query.skip(PAGINATION.itemsPerPage * (parseInt(page) - 1));
+        query.leftJoinAndSelect('sale.product', 'product');
+        sales = await query.take(PAGINATION.itemsPerPage).getMany();
+      } else {
+        query.leftJoinAndSelect('sale.product', 'product');
+        sales = await query.getMany();
+      }
+      const count = await query.getCount();
+
+      return { count, sales };
     } catch (error) {
       throw error;
     }
@@ -105,10 +103,10 @@ export class SaleService {
     try {
       const {
         from,
-        sale: { productId, soldAt, quantity },
+        sale: { product, soldAt, quantity },
       } = createSaleDto;
       const user = await this.userRepository.findOne({ where: { id: from } });
-      const getProduct = await this.productRepository.findOne(productId);
+      const getProduct = await this.productRepository.findOne(product);
       const saleManager = await this.saleManagerRepository.findOne({
         where: { user },
       });
@@ -134,6 +132,7 @@ export class SaleService {
 
             batch = newBatch;
           }
+
           const sale = this.saleRepository.create({
             soldAt,
             product: getProduct,
@@ -141,7 +140,7 @@ export class SaleService {
             store: saleManager.store,
             saleManager,
             saleBatch: batch,
-            date: new Date(),
+            date: moment().format('YYYY-MM-DD'),
           });
 
           await this.saleRepository.save(sale);
@@ -162,47 +161,27 @@ export class SaleService {
     }
   }
 
-  async update(
-    id: string,
-    createSaleDto: CreateSaleDto,
-    saleManager: SaleManager,
-  ): Promise<Sale> {
+  async delete(id: string, sm: string): Promise<any> {
     try {
-      const { soldAt, quantity } = createSaleDto;
-
-      //  Get sale
-      const sale = await this.saleRepository.findOne({
-        where: { id, saleManager },
-      });
-
-      if (sale) {
-        //  Only delete when batch is activ
-        if (sale.saleBatch.active) {
-          sale.soldAt = soldAt;
-          sale.quantity = quantity;
-
-          return this.saleRepository.save(sale);
-        }
-      }
-      throw new Error('Invalid request');
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async delete(id: string, saleManager: SaleManager): Promise<any> {
-    try {
+      const saleManager = await this.saleManagerRepository.findOne(sm);
       const sale = await this.saleRepository.findOne({
         where: { saleManager, id },
       });
+      // Add quantity back to product
+      const product = sale.product;
+      product.quantity = `${
+        parseInt(product.quantity) + parseInt(sale.quantity)
+      }`;
+      await this.productRepository.save(product);
+
       if (sale) {
-        //  Only delete when batch is activ
-        if (sale.saleBatch.active) {
-          const deleteSale = await this.saleRepository.remove(sale);
-          return deleteSale;
-        }
+        const deleteSale = await this.saleRepository.remove(sale);
+        return deleteSale;
+      } else {
+        return { error: 'Unable to delete sale' };
       }
-      throw new Error('Invalid request');
+
+      // throw new Error('Invalid request');
     } catch (error) {
       throw error;
     }

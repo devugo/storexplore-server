@@ -35,17 +35,29 @@ createConnection()
       console.log('Connected');
 
       socket.on('chat message', ({ from, to, message }) => {
-        console.log({ from, to, message });
+        console.log('Logging chat messages', { from, to, message });
         io.emit('chat message', { from, to, message });
         chatService.create({ from, to, message });
       });
 
       socket.on('add sale', async ({ from, sale }) => {
-        console.log('Loging add sale socket...');
+        console.log('Logging add sale socket...', { from, sale });
         const create = await saleService.create({ from, sale });
         if (create.error) {
+          io.emit('add sale', create);
         } else {
           io.emit('add sale', { from, sale: { ...sale, id: create.id } });
+        }
+      });
+
+      socket.on('delete sale', async ({ from, sale }) => {
+        console.log('Loging delete sale socket...', { from, sale });
+        //  'from' here is salemanager ID
+        const deleted = await saleService.delete(sale, from);
+        if (deleted.error) {
+          io.emit('delete sale', deleted);
+        } else {
+          io.emit('delete sale', { from, id: sale });
         }
       });
     });

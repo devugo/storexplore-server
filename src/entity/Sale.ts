@@ -27,7 +27,7 @@ export class Sale {
   date: Date;
 
   @ManyToOne((_type) => Product, (product) => product.sales, {
-    eager: false,
+    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
