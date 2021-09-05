@@ -120,7 +120,9 @@ export class SaleManagerController {
 
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      return response.status(400).json({ errors: errors.array() });
+      return response
+        .status(400)
+        .json({ message: validationErrorMessage(errors.array()) });
     }
 
     try {

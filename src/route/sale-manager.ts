@@ -46,7 +46,7 @@ export const SaleManagerRoutes = [
   },
   {
     method: 'patch',
-    route: '/sale-managers/activate//:id',
+    route: '/sale-managers/activate/:id',
     controller: SaleManagerController,
     action: 'activate',
     middleware: authenticate,
