@@ -7,6 +7,8 @@ import { UserService } from './UserService';
 import { User } from '../entity/User';
 import { uploadHelper } from '../helper/uploadHelper';
 import { RoleType } from '../enum/RoleType';
+import { GetSaleManagersFilterDto } from '../dto/get-sale-managers-filter.dto';
+import { PAGINATION } from '../constant/PAGINATION';
 
 // const notFoundErrMsg = (id: string): string =>
 //   notFoundErrorMessage('Store Manger', id);
@@ -16,13 +18,28 @@ export class SaleManagerService {
   private userRepository = getRepository(User);
   private userService = new UserService();
 
-  async get(store: Store): Promise<SaleManager[]> {
+  async get(
+    store: Store,
+    filterDto: GetSaleManagersFilterDto,
+  ): Promise<{ count: number; saleManagers: SaleManager[] }> {
+    const { page } = filterDto;
     try {
-      const saleManagers = await this.saleManagerRepository.find({
-        store,
+      const query =
+        this.saleManagerRepository.createQueryBuilder('sale_manager');
+      query.andWhere('sale_manager.storeId = :store', {
+        store: store.id,
       });
+      let saleManagers;
+      if (page) {
+        query.skip(PAGINATION.itemsPerPage * (parseInt(page) - 1));
+        saleManagers = await query.take(PAGINATION.itemsPerPage).getMany();
+      } else {
+        saleManagers = await query.getMany();
+      }
 
-      return saleManagers;
+      const count = await query.getCount();
+
+      return { count, saleManagers };
     } catch (error) {
       throw error;
     }

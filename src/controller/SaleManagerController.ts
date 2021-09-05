@@ -22,7 +22,10 @@ export class SaleManagerController {
       const store = await this.storeRepository.findOne({ user: storeUser });
 
       //  Create Sale Managers
-      const saleManagers = await this.saleManagerService.get(store);
+      const saleManagers = await this.saleManagerService.get(
+        store,
+        request.query,
+      );
 
       return saleManagers;
     } catch (error) {
