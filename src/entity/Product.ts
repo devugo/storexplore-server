@@ -28,8 +28,8 @@ export class Product {
   @Column({ nullable: true })
   imagePath?: string;
 
-  @Column()
-  quantity: string;
+  @Column({ nullable: true })
+  quantity?: number;
 
   @Column()
   costPrice: string;

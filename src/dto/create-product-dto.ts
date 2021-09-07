@@ -4,7 +4,7 @@ export type CreateProductDto = {
   name: string;
   description?: string;
   image?: string;
-  quantity: string;
+  quantity: number;
   costPrice: string;
   sellingPrice: string;
   store?: Store;

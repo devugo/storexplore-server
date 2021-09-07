@@ -143,7 +143,7 @@ export class SaleService {
 
           // Update Product quantity
           if (getProduct) {
-            getProduct.quantity = `${parseInt(getProduct.quantity) - quantity}`;
+            getProduct.quantity = getProduct.quantity - quantity;
 
             this.productRepository.save(getProduct);
           }
@@ -165,9 +165,7 @@ export class SaleService {
       });
       // Add quantity back to product
       const product = sale.product;
-      product.quantity = `${
-        parseInt(product.quantity) + parseInt(sale.quantity)
-      }`;
+      product.quantity = product.quantity + sale.quantity;
       await this.productRepository.save(product);
 
       if (sale) {

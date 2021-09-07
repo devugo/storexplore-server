@@ -17,11 +17,11 @@ export class Sale {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @Column()
-  soldAt: string;
+  @Column({ nullable: true, default: 0 })
+  soldAt?: number;
 
-  @Column()
-  quantity: string;
+  @Column({ nullable: true, default: 0 })
+  quantity?: number;
 
   @Column()
   date: Date;

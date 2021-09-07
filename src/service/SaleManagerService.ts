@@ -1,5 +1,4 @@
-import { getRepository } from 'typeorm';
-// import { notFoundErrorMessage } from '../helper/get-error-message';
+import { getManager, getRepository } from 'typeorm';
 import { SaleManager } from '../entity/SaleManager';
 import { CreateSaleManagerDto } from '../dto/create-sale-manager';
 import { Store } from '../entity/Store';
@@ -10,18 +9,16 @@ import { RoleType } from '../enum/RoleType';
 import { GetSaleManagersFilterDto } from '../dto/get-sale-managers-filter.dto';
 import { PAGINATION } from '../constant/PAGINATION';
 
-// const notFoundErrMsg = (id: string): string =>
-//   notFoundErrorMessage('Store Manger', id);
-
 export class SaleManagerService {
   private saleManagerRepository = getRepository(SaleManager);
   private userRepository = getRepository(User);
   private userService = new UserService();
+  private entityManager = getManager();
 
   async get(
     store: Store,
     filterDto: GetSaleManagersFilterDto,
-  ): Promise<{ count: number; saleManagers: SaleManager[] }> {
+  ): Promise<{ count: number; saleManagers: any }> {
     const { page } = filterDto;
     try {
       const query =
@@ -29,6 +26,8 @@ export class SaleManagerService {
       query.andWhere('sale_manager.storeId = :store', {
         store: store.id,
       });
+      query.leftJoinAndSelect('sale_manager.user', 'user');
+      query.leftJoinAndSelect('sale_manager.store', 'store');
       let saleManagers;
       if (page) {
         query.skip(PAGINATION.itemsPerPage * (parseInt(page) - 1));
@@ -39,10 +38,37 @@ export class SaleManagerService {
 
       const count = await query.getCount();
 
-      return { count, saleManagers };
+      const reSaleManagers = saleManagers.map(async (saleManager) => {
+        const totalSales = await this.totalSales(saleManager.id);
+        const totalProducts = await this.totalProductsSold(saleManager.id);
+        saleManager.totalSales = totalSales[0] ? totalSales[0].sales : 0;
+        saleManager.totalProducts = totalProducts[0]
+          ? totalProducts[0].products
+          : 0;
+        return saleManager;
+      });
+      const saleManagersWithSales = await Promise.all(reSaleManagers);
+
+      return { count, saleManagers: saleManagersWithSales };
     } catch (error) {
       throw error;
     }
+  }
+
+  totalSales(saleManager: string): any {
+    const total = this.entityManager.query(
+      'SELECT SUM("soldAt" * quantity) AS "sales" FROM sale WHERE sale."saleManagerId" = $1',
+      [saleManager],
+    );
+    return total;
+  }
+
+  totalProductsSold(saleManager: string): any {
+    const total = this.entityManager.query(
+      'SELECT SUM(quantity) AS "products" FROM sale WHERE sale."saleManagerId" = $1',
+      [saleManager],
+    );
+    return total;
   }
 
   async getOne(id: string, store: Store): Promise<SaleManager> {
