@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { getManager, getRepository } from 'typeorm';
 import { Store } from '../entity/Store';
 import { uploadHelper } from '../helper/uploadHelper';
 import { Product } from '../entity/Product';
@@ -8,11 +8,12 @@ import { PAGINATION } from '../constant/PAGINATION';
 
 export class ProductService {
   private productRepository = getRepository(Product);
+  private entityManager = getManager();
 
   async get(
     store: Store,
     filterDto: GetProductsFilterDto,
-  ): Promise<{ count: number; products: Product[] }> {
+  ): Promise<{ count: number; products: any }> {
     const { page } = filterDto;
     try {
       const query = this.productRepository.createQueryBuilder('product');
@@ -29,7 +30,16 @@ export class ProductService {
       }
       const count = await query.getCount();
 
-      return { count, products };
+      const reProducts = products.map(async (product) => {
+        const totalSales = await this.totalSales(product.id);
+        const totalSold = await this.totalSold(product.id);
+        product.totalSales = totalSales[0] ? totalSales[0].sales : 0;
+        product.totalSold = totalSold[0] ? totalSold[0].products : 0;
+        return product;
+      });
+      const productsWithSales = await Promise.all(reProducts);
+
+      return { count, products: productsWithSales };
     } catch (error) {
       throw error;
     }
@@ -45,6 +55,22 @@ export class ProductService {
     } catch (error) {
       throw error;
     }
+  }
+
+  totalSales(product: string): any {
+    const total = this.entityManager.query(
+      'SELECT SUM("soldAt" * quantity) AS "sales" FROM sale WHERE sale."productId" = $1',
+      [product],
+    );
+    return total;
+  }
+
+  totalSold(product: string): any {
+    const total = this.entityManager.query(
+      'SELECT SUM(quantity) AS "products" FROM sale WHERE sale."productId" = $1',
+      [product],
+    );
+    return total;
   }
 
   async create(
