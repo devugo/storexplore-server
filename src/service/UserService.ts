@@ -51,4 +51,21 @@ export class UserService {
       throw new Error('Invalid credentials');
     }
   }
+
+  async retain(email: string) {
+    const user = await this.userRepository.findOne({ email });
+    let saleManager;
+    if (user) {
+      saleManager = await this.saleManagerRepository.findOne({ user });
+
+      return {
+        email: user.email,
+        role: user.role,
+        id: user.id,
+        saleManager,
+      };
+    } else {
+      throw new Error('Not Found');
+    }
+  }
 }

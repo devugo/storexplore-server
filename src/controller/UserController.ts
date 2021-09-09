@@ -59,16 +59,18 @@ export class UserController {
     }
   }
 
-  async one(request: Request, response: Response, next: NextFunction) {
-    return this.userRepository.findOne(request.params.id);
-  }
+  async retain(request: Request, response: Response, next: NextFunction) {
+    const { email } = request.user;
 
-  async save(request: Request, response: Response, next: NextFunction) {
-    return this.userRepository.save(request.body);
-  }
-
-  async remove(request: Request, response: Response, next: NextFunction) {
-    const userToRemove = await this.userRepository.findOne(request.params.id);
-    await this.userRepository.remove(userToRemove);
+    try {
+      const user = await this.userService.retain(email);
+      return user;
+    } catch (err) {
+      const error = throwError({ code: ERROR_CODE.notFound });
+      return response.status(error.code).json({
+        message: error.message,
+        success: false,
+      });
+    }
   }
 }

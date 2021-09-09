@@ -1,4 +1,5 @@
 import { UserController } from '../controller/UserController';
+import { authenticate } from '../middleware/authenticate';
 import { createUserValidation } from '../validation/create-user-validation';
 
 export const AuthRoutes = [
@@ -16,6 +17,14 @@ export const AuthRoutes = [
     controller: UserController,
     action: 'login',
     middleware: null,
+    validation: [],
+  },
+  {
+    method: 'get',
+    route: '/auth/retain',
+    controller: UserController,
+    action: 'retain',
+    middleware: authenticate,
     validation: [],
   },
 ];
