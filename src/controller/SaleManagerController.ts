@@ -39,11 +39,9 @@ export class SaleManagerController {
 
   async getOne(request: Request, response: Response, next: NextFunction) {
     const { email } = request.user;
-    const id = request.params.id;
 
     try {
-      const storeUser = await this.userRepository.findOne({ email });
-      const store = await this.storeRepository.findOne({ user: storeUser });
+      const saleManagerUser = await this.userRepository.findOne({ email });
 
       const errors = validationResult(request);
       if (!errors.isEmpty()) {
@@ -51,7 +49,7 @@ export class SaleManagerController {
       }
 
       //  Get Sale Manager
-      const saleManager = await this.saleManagerService.getOne(id, store);
+      const saleManager = await this.saleManagerService.getOne(saleManagerUser);
 
       return saleManager;
     } catch (error) {

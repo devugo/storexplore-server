@@ -22,7 +22,7 @@ export const SaleManagerRoutes = [
   },
   {
     method: 'get',
-    route: '/sale-managers/:id',
+    route: '/sale-managers/one',
     controller: SaleManagerController,
     action: 'getOne',
     middleware: authenticate,

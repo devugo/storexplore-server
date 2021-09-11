@@ -71,13 +71,24 @@ export class SaleManagerService {
     return total;
   }
 
-  async getOne(id: string, store: Store): Promise<SaleManager> {
+  async getOne(user: User): Promise<any> {
     try {
-      const saleManager = await this.saleManagerRepository.findOne({
-        where: { id, store },
-      });
+      const saleManager = (await this.saleManagerRepository.findOne({
+        where: { user },
+      })) as any;
 
-      return saleManager;
+      if (saleManager) {
+        const totalSales = await this.totalSales(saleManager.id);
+        const totalProducts = await this.totalProductsSold(saleManager.id);
+
+        saleManager.totalSales = totalSales[0] ? totalSales[0].sales : 0;
+        saleManager.totalProducts = totalProducts[0]
+          ? totalProducts[0].products
+          : 0;
+        return saleManager;
+      } else {
+        throw new Error('Not Found');
+      }
     } catch (error) {
       throw error;
     }
@@ -189,10 +200,10 @@ export class SaleManagerService {
       const saleManager = await this.saleManagerRepository.findOne({
         where: { user },
       });
-      const logoPath = await uploadHelper(file);
+      const imagePath = await uploadHelper(file);
 
       if (saleManager) {
-        saleManager.photo = logoPath;
+        saleManager.photo = imagePath;
 
         await this.saleManagerRepository.save(saleManager);
       }
