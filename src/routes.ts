@@ -5,6 +5,7 @@ import { SaleBatchRoutes } from './route/sale-batches';
 import { SaleManagerRoutes } from './route/sale-manager';
 import { SaleRoutes } from './route/sales';
 import { StoreRoutes } from './route/store';
+import { StoreOwnerRoutes } from './route/store-owner';
 
 export const Routes = [
   ...AuthRoutes,
@@ -14,4 +15,5 @@ export const Routes = [
   ...SaleBatchRoutes,
   ...SaleRoutes,
   ...ChatRoutes,
+  ...StoreOwnerRoutes,
 ];

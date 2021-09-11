@@ -7,9 +7,11 @@ import { JwtPayload } from '../dto/jwt-payload';
 import { RoleType } from '../enum/RoleType';
 import { SaleManager } from '../entity/SaleManager';
 import { ChangePasswordDto } from '../dto/change-password.dto';
+import { StoreOwner } from '../entity/StoreOwner';
 export class UserService {
   private userRepository = getRepository(User);
   private saleManagerRepository = getRepository(SaleManager);
+  private storeOwnerRepository = getRepository(StoreOwner);
 
   async register(createUserDto: CreateUserDto): Promise<User> {
     const { email, password, role } = createUserDto;
@@ -35,6 +37,7 @@ export class UserService {
 
     const user = await this.userRepository.findOne({ email });
     const saleManager = await this.saleManagerRepository.findOne({ user });
+    const storeOwner = await this.storeOwnerRepository.findOne({ user });
 
     if (user && (await bcrypt.compare(password, user.password))) {
       const payload: JwtPayload = { email };
@@ -47,6 +50,7 @@ export class UserService {
         role: user.role,
         id: user.id,
         saleManager,
+        storeOwner,
       };
     } else {
       throw new Error('Invalid credentials');
@@ -58,12 +62,14 @@ export class UserService {
     let saleManager;
     if (user) {
       saleManager = await this.saleManagerRepository.findOne({ user });
+      const storeOwner = await this.storeOwnerRepository.findOne({ user });
 
       return {
         email: user.email,
         role: user.role,
         id: user.id,
         saleManager,
+        storeOwner,
       };
     } else {
       throw new Error('Not Found');

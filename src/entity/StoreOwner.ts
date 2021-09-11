@@ -18,6 +18,9 @@ export class StoreOwner {
   name: string;
 
   @Column({ nullable: true })
+  about?: string;
+
+  @Column({ nullable: true })
   photo?: string;
 
   @OneToOne(() => User, (user) => user.storeOwner, {
