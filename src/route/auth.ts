@@ -27,4 +27,12 @@ export const AuthRoutes = [
     middleware: authenticate,
     validation: [],
   },
+  {
+    method: 'patch',
+    route: '/auth/change-password',
+    controller: UserController,
+    action: 'changePassword',
+    middleware: authenticate,
+    validation: [],
+  },
 ];

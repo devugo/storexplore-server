@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtPayload } from '../dto/jwt-payload';
 import { RoleType } from '../enum/RoleType';
 import { SaleManager } from '../entity/SaleManager';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 export class UserService {
   private userRepository = getRepository(User);
   private saleManagerRepository = getRepository(SaleManager);
@@ -64,6 +65,20 @@ export class UserService {
         id: user.id,
         saleManager,
       };
+    } else {
+      throw new Error('Not Found');
+    }
+  }
+
+  async changePassword(email: string, changePasswordDto: ChangePasswordDto) {
+    const { password } = changePasswordDto;
+    const user = await this.userRepository.findOne({ email });
+    if (user) {
+      const salt = await bcrypt.genSalt();
+      const hashPassword = await bcrypt.hash(password, salt);
+      user.password = hashPassword;
+      await this.userRepository.save(user);
+      return user;
     } else {
       throw new Error('Not Found');
     }

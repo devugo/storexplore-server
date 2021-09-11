@@ -73,4 +73,30 @@ export class UserController {
       });
     }
   }
+
+  async changePassword(
+    request: Request,
+    response: Response,
+    next: NextFunction,
+  ) {
+    const { email } = request.user;
+    const { password, passwordAgain } = request.body;
+
+    if (password !== passwordAgain) {
+      return response.status(400).json({
+        message: 'Passwords do not match!',
+      });
+    }
+
+    try {
+      const user = await this.userService.changePassword(email, request.body);
+      return user;
+    } catch (err) {
+      const error = throwError({ code: ERROR_CODE.notFound });
+      return response.status(error.code).json({
+        message: error.message,
+        success: false,
+      });
+    }
+  }
 }
