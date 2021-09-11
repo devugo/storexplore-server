@@ -2,6 +2,7 @@ import { SaleManagerController } from '../controller/SaleManagerController';
 import { authenticate } from '../middleware/authenticate';
 import { activateResourceValidation } from '../validation/activate-resource-validation';
 import { createSaleManagerValidation } from '../validation/create-sale-manager-validation';
+import { updateSaleManagerValidation } from '../validation/update-sale-manager-validation';
 
 export const SaleManagerRoutes = [
   {
@@ -42,7 +43,7 @@ export const SaleManagerRoutes = [
     controller: SaleManagerController,
     action: 'update',
     middleware: authenticate,
-    validation: [],
+    validation: updateSaleManagerValidation,
   },
   {
     method: 'patch',

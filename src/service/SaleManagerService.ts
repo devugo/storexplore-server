@@ -140,7 +140,8 @@ export class SaleManagerService {
     user: User,
   ): Promise<SaleManager> {
     try {
-      const { firstname, lastname, othernames, dob } = createSaleManagerDto;
+      const { firstname, lastname, othernames, dob, gender, address } =
+        createSaleManagerDto;
 
       //  Get Sale Manager
       const saleManager = await this.saleManagerRepository.findOne({
@@ -152,6 +153,8 @@ export class SaleManagerService {
         saleManager.lastname = lastname;
         saleManager.othernames = othernames;
         saleManager.dob = dob;
+        saleManager.gender = gender;
+        saleManager.address = address;
       }
 
       return this.saleManagerRepository.save(saleManager);
