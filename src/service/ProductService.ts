@@ -14,12 +14,18 @@ export class ProductService {
     store: Store,
     filterDto: GetProductsFilterDto,
   ): Promise<{ count: number; products: any }> {
-    const { page } = filterDto;
+    const { page, search } = filterDto;
     try {
       const query = this.productRepository.createQueryBuilder('product');
       query.andWhere('product.storeId = :store', {
         store: store.id,
       });
+      if (search) {
+        query.andWhere(
+          '(LOWER(product.name) LIKE LOWER(:search) OR LOWER(product.description) LIKE LOWER(:search))',
+          { search: `%${search}%` },
+        );
+      }
       let products;
 
       if (page) {
