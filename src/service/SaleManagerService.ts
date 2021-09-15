@@ -19,13 +19,19 @@ export class SaleManagerService {
     store: Store,
     filterDto: GetSaleManagersFilterDto,
   ): Promise<{ count: number; saleManagers: any }> {
-    const { page } = filterDto;
+    const { page, search } = filterDto;
     try {
       const query =
         this.saleManagerRepository.createQueryBuilder('sale_manager');
       query.andWhere('sale_manager.storeId = :store', {
         store: store.id,
       });
+      if (search) {
+        query.andWhere(
+          '(LOWER(sale_manager.firstname) LIKE LOWER(:search) OR LOWER(sale_manager.lastname) LIKE LOWER(:search) OR LOWER(sale_manager.othernames) LIKE LOWER(:search))',
+          { search: `%${search}%` },
+        );
+      }
       query.leftJoinAndSelect('sale_manager.user', 'user');
       query.leftJoinAndSelect('sale_manager.store', 'store');
       let saleManagers;
