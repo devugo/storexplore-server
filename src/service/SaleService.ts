@@ -22,16 +22,30 @@ export class SaleService {
     saleManager: SaleManager,
     filterDto: GetSalesFilterDto,
   ): Promise<{ count: number; sales: Sale[] }> {
-    const { date, page } = filterDto;
+    const { page, product, startDate, endDate, saleManager: saleM } = filterDto;
     try {
       let sales;
       const query = this.saleRepository.createQueryBuilder('sale');
       query.andWhere('sale.storeId = :store', {
         store: store.id,
       });
-      if (date) {
-        query.andWhere('sale.date = :date', {
-          date: `${date} 01:00:00`,
+      if (product) {
+        query.andWhere('sale.productId = :product', {
+          product: product,
+        });
+      }
+      //  Store owner sale manager query param
+      if (saleM) {
+        query.andWhere('sale.saleManagerId = :sm', {
+          sm: saleM,
+        });
+      }
+      if (startDate && endDate) {
+        const startDateIsoString = new Date(startDate).toISOString();
+        const endDateIsoString = new Date(endDate + ' 23:59:59').toISOString();
+        query.andWhere('sale.createdAt BETWEEN :startDate AND :endDate', {
+          startDate: startDateIsoString,
+          endDate: endDateIsoString,
         });
       }
       if (saleManager) {
