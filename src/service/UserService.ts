@@ -39,6 +39,14 @@ export class UserService {
     const saleManager = await this.saleManagerRepository.findOne({ user });
     const storeOwner = await this.storeOwnerRepository.findOne({ user });
 
+    if (saleManager) {
+      if (!saleManager.active) {
+        throw new Error(
+          'Your account is not active. Please, contact your provider',
+        );
+      }
+    }
+
     if (user && (await bcrypt.compare(password, user.password))) {
       const payload: JwtPayload = { email };
       const accessToken = await jwt.sign(payload, process.env.JWT_SECRET, {
