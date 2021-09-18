@@ -26,7 +26,7 @@ createConnection()
     const server = http.createServer(app);
     const io = new Server(server, {
       cors: {
-        origin: 'http://localhost:3000',
+        origin: process.env.CLIENT_URL,
         methods: ['GET', 'POST'],
       },
     });
@@ -36,7 +36,12 @@ createConnection()
 
       socket.on('chat message', ({ from, to, message }) => {
         console.log('Logging chat messages', { from, to, message });
-        io.emit('chat message', { from, to, message });
+        io.emit('chat message', {
+          from,
+          to,
+          message,
+          createdAt: new Date().toISOString(),
+        });
         chatService.create({ from, to, message });
       });
 
