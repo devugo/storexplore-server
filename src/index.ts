@@ -41,6 +41,7 @@ createConnection()
           to,
           message,
           createdAt: new Date().toISOString(),
+          new: true,
         });
         chatService.create({ from, to, message });
       });
@@ -51,7 +52,10 @@ createConnection()
         if (create.error) {
           io.emit('add sale', create);
         } else {
-          io.emit('add sale', { from, sale: { ...sale, id: create.id } });
+          io.emit('add sale', {
+            from,
+            sale: { ...sale, id: create.id, new: true },
+          });
         }
       });
 
