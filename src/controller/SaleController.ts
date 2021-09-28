@@ -114,4 +114,34 @@ export class SaleController {
       });
     }
   }
+
+  async dashboardSummary(
+    request: Request,
+    response: Response,
+    next: NextFunction,
+  ) {
+    // return 'mike';
+    const { email } = request.user;
+    // const id = request.params.id;
+    // console.log({ reqUser: request.user, id });
+
+    try {
+      const storeUser = await this.userRepository.findOne({ email });
+      const store = await this.storeRepository.findOne({ user: storeUser });
+      // return store;
+
+      //  Get sale
+      const sales = await this.saleService.todaySales(store);
+      console.log({ sales });
+
+      return sales;
+    } catch (error) {
+      console.log(error.response);
+      const err = throwError(error);
+      return response.status(err.code).json({
+        message: err.message,
+        success: false,
+      });
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { getManager, getRepository } from 'typeorm';
 import { Store } from '../entity/Store';
 import { Product } from '../entity/Product';
 import { Sale } from '../entity/Sale';
@@ -16,6 +16,7 @@ export class SaleService {
   private saleBatchRepository = getRepository(SaleBatch);
   private userRepository = getRepository(User);
   private saleManagerRepository = getRepository(SaleManager);
+  private entityManager = getManager();
 
   async get(
     store: Store,
@@ -205,5 +206,24 @@ export class SaleService {
     } catch (error) {
       throw error;
     }
+  }
+
+  todaySales(store: Store): any {
+    console.log({ store });
+    const startDateIsoString = new Date().toISOString();
+    const endDateIsoString = new Date().toISOString();
+    // const query = this.saleRepository.createQueryBuilder('sale');
+    // query.andWhere('sale.storeId = :store', {
+    //   store: store.id,
+    // });
+    // const today = await query.getMany();
+    console.log({ startDateIsoString, endDateIsoString });
+    const today = this.entityManager.query(
+      'SELECT COUNT(id) FROM sale WHERE sale.storeId = $1',
+      ['b3ca4358-72fb-4866-b6bc-63a21e559200'],
+    );
+
+    // console.log({ today });
+    return today;
   }
 }

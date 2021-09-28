@@ -94,7 +94,7 @@ createConnection()
                   ? res.send(result)
                   : undefined,
               )
-              .catch((error) => console.log('ROuting error found,,,'));
+              .catch((error) => console.log(error));
           } else if (result !== null && result !== undefined) {
             res.json(result);
           }

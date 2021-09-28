@@ -34,4 +34,12 @@ export const SaleRoutes = [
     middleware: authenticate,
     validation: [],
   },
+  {
+    method: 'get',
+    route: '/sales-summary',
+    controller: SaleController,
+    action: 'dashboardSummary',
+    middleware: authenticate,
+    validation: [],
+  },
 ];
