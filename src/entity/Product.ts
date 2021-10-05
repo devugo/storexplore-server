@@ -28,14 +28,14 @@ export class Product {
   @Column({ nullable: true })
   imagePath?: string;
 
+  @Column()
+  quantity: number;
+
+  @Column()
+  costPrice: number;
+
   @Column({ nullable: true })
-  quantity?: number;
-
-  @Column()
-  costPrice: string;
-
-  @Column()
-  sellingPrice: string;
+  sellingPrice?: number;
 
   @OneToMany((_type) => Sale, (sale) => sale.product, {
     eager: false,

@@ -120,23 +120,29 @@ export class SaleController {
     response: Response,
     next: NextFunction,
   ) {
-    // return 'mike';
     const { email } = request.user;
-    // const id = request.params.id;
-    // console.log({ reqUser: request.user, id });
+    const format = request.query.format;
 
     try {
-      const storeUser = await this.userRepository.findOne({ email });
-      const store = await this.storeRepository.findOne({ user: storeUser });
-      // return store;
+      const user = await this.userRepository.findOne({ email });
+      let store;
+      let saleManager;
+      store = await this.storeRepository.findOne({ user });
+
+      if (!store) {
+        saleManager = await this.saleManagerRepository.findOne({ user });
+        store = saleManager.store;
+      }
 
       //  Get sale
-      const sales = await this.saleService.todaySales(store);
-      console.log({ sales });
+      const sales = await this.saleService.dashboardSummary(
+        store,
+        format,
+        saleManager,
+      );
 
       return sales;
     } catch (error) {
-      console.log(error.response);
       const err = throwError(error);
       return response.status(err.code).json({
         message: err.message,

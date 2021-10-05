@@ -8,7 +8,6 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { Product } from './Product';
-import { SaleBatch } from './SaleBatch';
 import { SaleManager } from './SaleManager';
 import { Store } from './Store';
 
@@ -32,13 +31,6 @@ export class Sale {
   })
   @JoinColumn()
   product: Product;
-
-  @ManyToOne((_type) => SaleBatch, (saleBatch) => saleBatch.sales, {
-    eager: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn()
-  saleBatch: SaleBatch;
 
   @ManyToOne((_type) => Store, (store) => store.sales, {
     eager: false,

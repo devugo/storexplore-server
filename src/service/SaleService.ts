@@ -3,17 +3,17 @@ import { Store } from '../entity/Store';
 import { Product } from '../entity/Product';
 import { Sale } from '../entity/Sale';
 import { SaleManager } from '../entity/SaleManager';
-import { SaleBatch } from '../entity/SaleBatch';
 import { GetSalesFilterDto } from '../dto/get-sales.dto';
 import { User } from '../entity/User';
 import { PAGINATION } from '../constant/PAGINATION';
+import { SaleSummaryType } from '../types';
+import { dateRangeUsingSummaryFormat } from '../helper/daterangeUsingSummaryFormat';
 
 const moment = require('moment');
 
 export class SaleService {
   private saleRepository = getRepository(Sale);
   private productRepository = getRepository(Product);
-  private saleBatchRepository = getRepository(SaleBatch);
   private userRepository = getRepository(User);
   private saleManagerRepository = getRepository(SaleManager);
   private entityManager = getManager();
@@ -37,6 +37,7 @@ export class SaleService {
       query.andWhere('sale.storeId = :store', {
         store: store.id,
       });
+      query.orderBy('sale.createdAt', 'DESC');
       if (product) {
         query.andWhere('sale.productId = :product', {
           product: product,
@@ -136,33 +137,12 @@ export class SaleService {
 
       if (getProduct) {
         if (getProduct.quantity >= quantity) {
-          let batch;
-          // Check if batch has been created
-          const batchExist = await this.saleBatchRepository.findOne({
-            date: new Date(),
-            saleManager,
-          });
-
-          if (batchExist) {
-            batch = batchExist;
-          } else {
-            // Create new batch
-            const newBatch = await this.saleBatchRepository.create({
-              date: new Date(),
-              saleManager,
-              store: saleManager.store,
-            });
-
-            batch = newBatch;
-          }
-
           const sale = this.saleRepository.create({
             soldAt,
             product: getProduct,
             quantity,
             store: saleManager.store,
             saleManager,
-            saleBatch: batch,
             date: moment().format('YYYY-MM-DD'),
           });
 
@@ -201,29 +181,42 @@ export class SaleService {
       } else {
         return { error: 'Unable to delete sale' };
       }
-
-      // throw new Error('Invalid request');
     } catch (error) {
       throw error;
     }
   }
 
-  todaySales(store: Store): any {
-    console.log({ store });
-    const startDateIsoString = new Date().toISOString();
-    const endDateIsoString = new Date().toISOString();
-    // const query = this.saleRepository.createQueryBuilder('sale');
-    // query.andWhere('sale.storeId = :store', {
-    //   store: store.id,
-    // });
-    // const today = await query.getMany();
-    console.log({ startDateIsoString, endDateIsoString });
-    const today = this.entityManager.query(
-      'SELECT COUNT(id) FROM sale WHERE sale.storeId = $1',
-      ['b3ca4358-72fb-4866-b6bc-63a21e559200'],
-    );
+  async dashboardSummary(
+    store: Store,
+    format: SaleSummaryType,
+    saleManager?: SaleManager,
+  ): Promise<any> {
+    const query = this.saleRepository.createQueryBuilder('sale');
+    query.andWhere('sale.storeId = :store', {
+      store: store.id,
+    });
+    const { start, end } = dateRangeUsingSummaryFormat(format);
+    query.andWhere('sale.createdAt BETWEEN :startDate AND :endDate', {
+      startDate: start,
+      endDate: end,
+    });
+    if (saleManager) {
+      query.andWhere('sale.saleManagerId = :sm', {
+        sm: saleManager.id,
+      });
+    }
+    query.leftJoinAndSelect('sale.product', 'product');
 
-    // console.log({ today });
-    return today;
+    const sales = await query.getMany();
+    let totalSales = 0;
+    let totalProfit = 0;
+    let totalItemsSold = 0;
+
+    sales.forEach((sale) => {
+      totalSales += sale.soldAt * sale.quantity;
+      totalProfit += (sale.soldAt - sale.product.costPrice) * sale.quantity;
+      totalItemsSold += sale.quantity;
+    });
+    return { totalSales, totalProfit, totalItemsSold };
   }
 }

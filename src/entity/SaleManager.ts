@@ -11,7 +11,6 @@ import {
 } from 'typeorm';
 import { GenderType } from '../enum/GenderType';
 import { Sale } from './Sale';
-import { SaleBatch } from './SaleBatch';
 import { Store } from './Store';
 import { User } from './User';
 
@@ -55,11 +54,6 @@ export class SaleManager {
     eager: false,
   })
   sales: Sale[];
-
-  @OneToMany((_type) => SaleBatch, (saleBatch) => saleBatch.saleManager, {
-    eager: false,
-  })
-  saleBatches: SaleBatch[];
 
   @ManyToOne((_type) => Store, (store) => store.saleManagers, {
     eager: true,
