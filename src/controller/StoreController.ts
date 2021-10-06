@@ -3,9 +3,8 @@ import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { StoreService } from '../service/StoreService';
 import { CreateStoreDto } from '../dto/create-store.dto';
-import { throwError, unathorizedError } from '../helper/throw-error';
+import { unathorizedError } from '../helper/throw-error';
 import { User } from '../entity/User';
-import { successCreationMessage } from '../helper/get-error-message';
 
 import * as Formidable from 'formidable';
 import { uploadHelper } from '../helper/uploadHelper';
@@ -14,41 +13,6 @@ import { validationErrorMessage } from '../helper/validation-error-message';
 export class StoreController {
   private storeService = new StoreService();
   private userRepository = getRepository(User);
-
-  async create(request: Request, response: Response, next: NextFunction) {
-    const { name, industry, address, defaultPassword }: CreateStoreDto =
-      request.body;
-
-    const { email } = request.user;
-    const user = await this.userRepository.findOne({ email });
-
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-      return response
-        .status(400)
-        .json({ message: validationErrorMessage(errors.array()) });
-    }
-    try {
-      const create = await this.storeService.create({
-        name,
-        industry,
-        address,
-        defaultPassword,
-        user,
-      });
-      return response.status(201).json({
-        success: true,
-        message: successCreationMessage('Store'),
-        response: create,
-      });
-    } catch (error) {
-      const err = throwError(error);
-      return response.status(err.code).json({
-        message: err.message,
-        success: false,
-      });
-    }
-  }
 
   async single(request: Request, response: Response, next: NextFunction) {
     const requestUser = request.user;
@@ -109,24 +73,37 @@ export class StoreController {
 
         const file: string = await new Promise(function (resolve, reject) {
           form.parse(request, async (err, fields, files) => {
-            resolve(files.image.path);
+            if (files && files.image && files.image.path) {
+              resolve(files.image.path);
+            } else {
+              reject(err);
+            }
           });
         });
-
-        const logoPath = await uploadHelper(file);
-        if (typeof logoPath === 'string') {
-          const updateStore = await this.storeService.updateLogo(
-            response,
-            id,
-            logoPath,
-            user,
-          );
-          return updateStore;
+        if (file) {
+          const logoPath = await uploadHelper(file);
+          if (typeof logoPath === 'string') {
+            const updateStore = await this.storeService.updateLogo(
+              response,
+              id,
+              logoPath,
+              user,
+            );
+            return updateStore;
+          }
+          return logoPath;
         }
-        return logoPath;
+      } else {
+        return response
+          .status(400)
+          .json({ message: 'Please, specify a store' });
       }
-    } catch (_error) {
-      return unathorizedError(response);
+    } catch (error) {
+      if (!error) {
+        return response.status(400).json({ message: 'Please, uplaod a file' });
+      } else {
+        return unathorizedError(response);
+      }
     }
   }
 }

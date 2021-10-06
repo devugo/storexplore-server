@@ -96,30 +96,6 @@ export class SaleService {
     }
   }
 
-  async getOne(id: string, store: Store): Promise<Sale> {
-    try {
-      const sale = await this.saleRepository.findOne({
-        where: { id, store },
-      });
-
-      return sale;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async mySale(id: string, saleManager: SaleManager): Promise<Sale> {
-    try {
-      const sale = await this.saleRepository.findOne({
-        where: { id, saleManager },
-      });
-
-      return sale;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async create(createSaleDto: {
     from: string;
     sale: any;

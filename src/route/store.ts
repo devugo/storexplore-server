@@ -4,14 +4,6 @@ import { createStoreValidation } from '../validation/create-store-validation';
 
 export const StoreRoutes = [
   {
-    method: 'post',
-    route: '/stores',
-    controller: StoreController,
-    action: 'create',
-    middleware: authenticate,
-    validation: createStoreValidation,
-  },
-  {
     method: 'get',
     route: '/stores/mine',
     controller: StoreController,

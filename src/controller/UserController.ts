@@ -1,6 +1,4 @@
-import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
-import { User } from '../entity/User';
 import { UserService } from '../service/UserService';
 import { CreateUserDto } from '../dto/create-user-dto';
 import { validationResult } from 'express-validator';
@@ -11,7 +9,6 @@ import { validationErrorMessage } from '../helper/validation-error-message';
 import { StoreService } from '../service/StoreService';
 
 export class UserController {
-  private userRepository = getRepository(User);
   private userService = new UserService();
   private storeOwnerService = new StoreOwnerService();
   private storeService = new StoreService();
@@ -79,6 +76,12 @@ export class UserController {
     response: Response,
     next: NextFunction,
   ) {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+      return response
+        .status(400)
+        .json({ message: validationErrorMessage(errors.array()) });
+    }
     const { email } = request.user;
     const { password, passwordAgain } = request.body;
 

@@ -1,5 +1,6 @@
 import { UserController } from '../controller/UserController';
 import { authenticate } from '../middleware/authenticate';
+import { changePasswordValidation } from '../validation/change-password-validation';
 import { createUserValidation } from '../validation/create-user-validation';
 
 export const AuthRoutes = [
@@ -33,6 +34,6 @@ export const AuthRoutes = [
     controller: UserController,
     action: 'changePassword',
     middleware: authenticate,
-    validation: [],
+    validation: changePasswordValidation,
   },
 ];
