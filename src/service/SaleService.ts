@@ -7,7 +7,7 @@ import { GetSalesFilterDto } from '../dto/get-sales.dto';
 import { User } from '../entity/User';
 import { PAGINATION } from '../constant/PAGINATION';
 import { SaleSummaryType } from '../types';
-import { dateRangeUsingSummaryFormat } from '../helper/daterangeUsingSummaryFormat';
+import { dateRangeUsingSummaryFormat } from '../helper/dateRangeUsingSummaryFormat';
 
 const moment = require('moment');
 
