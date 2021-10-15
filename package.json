@@ -38,9 +38,7 @@
   },
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "deploy": "node build/index.js",
-    "build": "tsc-node src/index.ts",
-    "postinstall": "npm run build",
+    "deploy": "ts-node build/index.ts",
     "format": "prettier --write .",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
   }
