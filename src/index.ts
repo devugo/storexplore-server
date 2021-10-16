@@ -106,7 +106,7 @@ createConnection()
     // ...
 
     // start express server
-    server.listen(process.env.PORT);
+    server.listen(process.env.PORT || 4000);
 
     console.log(
       'Express server has started on port 4000. Open http://localhost:4000 to begin',
