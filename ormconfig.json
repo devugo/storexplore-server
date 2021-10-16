@@ -1,6 +1,6 @@
 {
   "type": "postgres",
-  "host": "localhost",
+  "host": "ec2-79-125-30-28.eu-west-1.compute.amazonaws.com",
   "port": 5432,
   "username": "ftrafwpbhsuekk",
   "password": "fc9f3e84c86f87f17ef0ab0e43fad13ec6974480ff13fe6bf9890ab66d3b8268",
