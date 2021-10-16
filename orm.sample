@@ -1,10 +1,10 @@
 {
   "type": "postgres",
-  "host": "ec2-79-125-30-28.eu-west-1.compute.amazonaws.com",
+  "host": "localhost",
   "port": 5432,
-  "username": "ftrafwpbhsuekk",
-  "password": "fc9f3e84c86f87f17ef0ab0e43fad13ec6974480ff13fe6bf9890ab66d3b8268",
-  "database": "d3ulvvkkuiebut",
+  "username": "postgres",
+  "password": "password",
+  "database": "storexplore",
   "synchronize": true,
   "logging": false,
   "entities": ["src/entity/**/*.ts"],
@@ -14,6 +14,5 @@
     "entitiesDir": "src/entity",
     "migrationsDir": "src/migration",
     "subscribersDir": "src/subscriber"
-  },
-  "ssl": true
+  }
 }
