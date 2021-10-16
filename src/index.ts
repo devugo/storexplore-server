@@ -14,30 +14,7 @@ import { Routes } from './routes';
 import { ChatService } from './service/ChatService';
 import { SaleService } from './service/SaleService';
 
-createConnection({
-  // url: process.env.DATABASE_URL,
-  // type: 'postgres',
-  // synchronize: true,
-  extra: {
-    ssl: true,
-  },
-  type: 'postgres',
-  host: 'ec2-79-125-30-28.eu-west-1.compute.amazonaws.com',
-  port: 5432,
-  username: 'ftrafwpbhsuekk',
-  password: 'fc9f3e84c86f87f17ef0ab0e43fad13ec6974480ff13fe6bf9890ab66d3b8268',
-  database: 'd3ulvvkkuiebut',
-  synchronize: true,
-  logging: false,
-  entities: ['src/entity/**/*.ts'],
-  migrations: ['src/migration/**/*.ts'],
-  subscribers: ['src/subscriber/**/*.ts'],
-  cli: {
-    entitiesDir: 'src/entity',
-    migrationsDir: 'src/migration',
-    subscribersDir: 'src/subscriber',
-  },
-})
+createConnection()
   .then(async (connection) => {
     const app = express();
     app.use(cors());
