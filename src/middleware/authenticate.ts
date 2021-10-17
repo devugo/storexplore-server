@@ -1,4 +1,5 @@
 import * as jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '../config';
 
 export const authenticate = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -6,7 +7,7 @@ export const authenticate = (req, res, next) => {
 
   if (token == null) return res.sendStatus(401);
 
-  jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
+  jwt.verify(token, JWT_SECRET as string, (err: any, user: any) => {
     if (err)
       return res.status(403).json({
         message: 'Unathourized',

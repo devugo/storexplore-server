@@ -4,17 +4,47 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import { Request, Response } from 'express';
 import * as cors from 'cors';
-import * as dotenv from 'dotenv';
 const http = require('http');
 import * as SocketIO from 'socket.io';
 const { Server } = SocketIO;
-// get config vars
-dotenv.config();
 import { Routes } from './routes';
 import { ChatService } from './service/ChatService';
 import { SaleService } from './service/SaleService';
+import {
+  CLIENT_URL,
+  DB_DATABASE,
+  DB_HOST,
+  DB_PASSWORD,
+  DB_PORT,
+  DB_USERNAME,
+  PORT,
+  STAGE,
+} from './config';
 
-createConnection()
+const isProduction = STAGE === 'prod';
+
+createConnection({
+  type: 'postgres',
+  host: DB_HOST,
+  port: parseInt(DB_PORT),
+  username: DB_USERNAME,
+  password: DB_PASSWORD,
+  database: DB_DATABASE,
+  synchronize: true,
+  logging: false,
+  entities: ['src/entity/**/*.ts'],
+  migrations: ['src/migration/**/*.ts'],
+  subscribers: ['src/subscriber/**/*.ts'],
+  cli: {
+    entitiesDir: 'src/entity',
+    migrationsDir: 'src/migration',
+    subscribersDir: 'src/subscriber',
+  },
+  ssl: isProduction,
+  extra: {
+    ssl: isProduction ? { rejectUnauthorized: false } : null,
+  },
+})
   .then(async (connection) => {
     const app = express();
     app.use(cors());
@@ -26,7 +56,7 @@ createConnection()
     const server = http.createServer(app);
     const io = new Server(server, {
       cors: {
-        origin: process.env.CLIENT_URL,
+        origin: CLIENT_URL,
         methods: ['GET', 'POST'],
       },
     });
@@ -94,20 +124,19 @@ createConnection()
                   ? res.send(result)
                   : undefined,
               )
-              .catch((error) => console.log(error));
+              .catch((error) => console.log({ errorRoute: error }));
           } else if (result !== null && result !== undefined) {
             res.json(result);
           }
         },
       );
     });
-    console.log({ processPortUgo: process.env.PORT });
 
     // setup express app here
     // ...
 
     // start express server
-    server.listen(process.env.PORT || 4000);
+    server.listen(parseInt(PORT) || 4000);
 
     console.log(
       'Express server has started on port 4000. Open http://localhost:4000 to begin',

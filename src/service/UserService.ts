@@ -8,6 +8,7 @@ import { RoleType } from '../enum/RoleType';
 import { SaleManager } from '../entity/SaleManager';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { StoreOwner } from '../entity/StoreOwner';
+import { JWT_EXPIRE_DURATION, JWT_SECRET } from '../config';
 export class UserService {
   private userRepository = getRepository(User);
   private saleManagerRepository = getRepository(SaleManager);
@@ -49,8 +50,8 @@ export class UserService {
 
     if (user && (await bcrypt.compare(password, user.password))) {
       const payload: JwtPayload = { email };
-      const accessToken = await jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE_DURATION,
+      const accessToken = await jwt.sign(payload, JWT_SECRET, {
+        expiresIn: JWT_EXPIRE_DURATION,
       });
       return {
         accessToken,
