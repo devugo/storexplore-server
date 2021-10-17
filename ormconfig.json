@@ -15,5 +15,7 @@
     "migrationsDir": "src/migration",
     "subscribersDir": "src/subscriber"
   },
-  "ssl": true
+  "ssl": {
+    "rejectUnauthorized": false
+  }
 }
