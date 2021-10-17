@@ -35,6 +35,6 @@ Follow the documentation below to see the various endpoints
 
 ## DOCUMENTATION
 
-### Documentation URL
+### POSTMAN documentation JSON url
 
 - [docs](https://www.getpostman.com/collections/44b7f83f99d6441782bc).
